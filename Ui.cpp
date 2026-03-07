@@ -1,1 +1,2 @@
-#include <SFML/Graphics.hpp>
+#include "gameglobale.h"
+#include "functions.h"

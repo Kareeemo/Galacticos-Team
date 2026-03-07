@@ -1,9 +1,9 @@
-#include <SFML/Graphics.hpp>
-using namespace sf;
+#include "gameglobale.h"
+#include "functions.h"
 
 int main() 
 {
-    RenderWindow window(VideoMode({800, 600}), "My Window");
+    RenderWindow window(VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}), "game title");
 
     while (window.isOpen())
     {
