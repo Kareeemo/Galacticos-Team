@@ -3,7 +3,7 @@
 
 int main() 
 {
-    RenderWindow window(VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}), "game title");
+    RenderWindow window(VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}), "Stick Fight");
 
     while (window.isOpen())
     {
