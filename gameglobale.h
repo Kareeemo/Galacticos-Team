@@ -32,5 +32,30 @@ using namespace sf;
     Vec2 spawnPoint;
    };
 
+    std::vector<Level> levels;
+  
+
+// Player 
+  struct Player{
+      Vec2 position;
+      Vec2 velocity;
+      float width;
+      float height;
+      int health;
+      int maxHealth;
+      bool onGround;
+      bool facingRight;
+      bool isAlive;
+      int score;
+      bool inputLeft;
+      bool inputRight;
+      bool inputJump;
+      bool inputAttack;
+      bool isAttacking;
+      float attackTimer;
+      float attackCooldown;
+      sf::FloatRect attackBox;
+    };
+
    
 #endif
