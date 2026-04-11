@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceFolder}",
                 "${workspaceFolder}/**",
-                "C:\\SFML-3.0.0\\include"
+                "C:\\Users\\karim\\Documents\\libraries\\SFML-3.0.0\\include"
             ],
             "defines": [
                 "_DEBUG",
@@ -13,10 +13,10 @@
                 "_UNICODE"
             ],
             "windowsSdkVersion": "10.0.19041.0",
-            "compilerPath": "cl.exe",
+            "compilerPath": "C:/mingw64/bin/g++.exe",
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "windows-msvc-x64"
+            "intelliSenseMode": "windows-gcc-x64"
         }
     ],
     "version": 4

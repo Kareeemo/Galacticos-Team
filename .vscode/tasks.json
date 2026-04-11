@@ -3,13 +3,13 @@
         {
             "type": "cppbuild",
             "label": "C/C++: g++.exe build active file",
-            "command": "C:\\msys64\\ucrt64\\bin\\g++.exe",
+            "command": "C:\\mingw64\\bin\\g++.exe",
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "-IC:\\SFML-3.0.0\\include",
+                "C:\\Users\\karim\\Documents\\libraries\\SFML-3.0.0\\include",
                 "${file}",
-                "-LC:\\SFML-3.0.0\\lib",
+                "-LC:\\Users\\karim\\Documents\\libraries\\SFML-3.0.0\\lib",
                 "-lsfml-graphics",
                 "-lsfml-window",
                 "-lsfml-system",
