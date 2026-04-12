@@ -17,26 +17,10 @@ using namespace sf;
     float x, y;
    };
 
-  //  Level
-   struct Platform{
-    sf::FloatRect rect;
-    bool solid;
-   };
+   // Player 
 
-   const int MAX_PLATFORMS = 64;
-
-   struct Level{
-    Platform platforms[MAX_PLATFORMS];
-    int platformCount;
-    sf::Color bgColor;
-    Vec2 spawnPoint;
-   };
-
-    std::vector<Level> levels;
-  
-
-// Player 
-  struct Player{
+   const int MAX_PLAYERS = 2;
+     struct Player{
       Vec2 position;
       Vec2 velocity;
       float width;
@@ -55,7 +39,35 @@ using namespace sf;
       float attackTimer;
       float attackCooldown;
       sf::FloatRect attackBox;
-    };
+      };
+
+  //  Level
+   struct Platform{
+    sf::FloatRect rect;
+    bool solid;
+   };
+
+   const int MAX_PLATFORMS = 64;
+
+   struct Level{
+    Platform platforms[MAX_PLATFORMS];
+    int platformCount;
+    sf::Color bgColor;
+    Vec2 spawnPoints[MAX_PLAYERS];
+   };
+
+   struct GameState{
+    Player players[MAX_PLAYERS];
+    Level currentLevel;
+    float deltaTime;
+    bool paused;
+    bool gameOver;
+    
+   };
+
+    std::vector<Level> levels;
+  
+
 
    
 #endif
