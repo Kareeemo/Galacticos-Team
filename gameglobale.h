@@ -13,14 +13,14 @@ using namespace sf;
    const int WINDOW_HEIGHT = 900;
    int score = 0;
 
-   struct Vec2{
+   struct Vec2 {
     float x, y;
    };
 
    // Player 
 
    const int MAX_PLAYERS = 2;
-     struct Player{
+     struct Player {
       Vec2 position;
       Vec2 velocity;
       float width;
@@ -42,21 +42,21 @@ using namespace sf;
       };
 
   //  Level
-   struct Platform{
+   struct Platform {
     sf::FloatRect rect;
     bool solid;
    };
 
    const int MAX_PLATFORMS = 64;
 
-   struct Level{
+   struct Level {
     Platform platforms[MAX_PLATFORMS];
     int platformCount;
     sf::Color bgColor;
     Vec2 spawnPoints[MAX_PLAYERS];
    };
 
-   struct GameState{
+   struct GameState {
     Player players[MAX_PLAYERS];
     Level currentLevel;
     float deltaTime;
