@@ -45,6 +45,9 @@ using namespace sf;
    struct Platform {
     sf::FloatRect rect;
     bool solid;
+    Vec2 position;
+    Vec2 size;
+    sf::Color color;
    };
 
    const int MAX_PLATFORMS = 64;

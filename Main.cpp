@@ -1,5 +1,4 @@
 #include "gameglobale.h"
-#include "functions.h"
 
 int main() 
 {
