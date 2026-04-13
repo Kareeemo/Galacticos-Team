@@ -1,4 +1,17 @@
+# VS Code
 .vscode/
-Makefile
-tasks.json
-launch.json
+
+# C++
+*.exe
+*.out
+*.o
+
+# Build folders
+build/
+bin/
+
+# SFML DLLs
+*.dll
+
+# Temp
+*.tmp
