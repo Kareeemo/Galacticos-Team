@@ -41,6 +41,22 @@ void drawHealthBar(RenderWindow& window, Player& p) {
 }
 
 void drawBackground(RenderWindow& window) {
+    static Texture backgroundTexture;
+    static bool textureLoaded = backgroundTexture.loadFromFile("assets/hero.png");
+
+    if (textureLoaded) {
+        Sprite background(backgroundTexture);
+        const Vector2u textureSize = backgroundTexture.getSize();
+        if (textureSize.x > 0 && textureSize.y > 0) {
+            background.setScale(Vector2f(
+                static_cast<float>(WINDOW_WIDTH) / static_cast<float>(textureSize.x),
+                static_cast<float>(WINDOW_HEIGHT) / static_cast<float>(textureSize.y)
+            ));
+        }
+        window.draw(background);
+        return;
+    }
+
     RectangleShape bg(Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT));
     bg.setFillColor(Color(30, 30, 30));
     window.draw(bg);
