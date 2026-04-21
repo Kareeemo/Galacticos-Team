@@ -16,8 +16,8 @@ void physicsUpdate(Player& p, float dt) {
     p.pos.x += p.velocity.x * dt;
     p.pos.y += p.velocity.y * dt;
 
-    if (p.pos.y + p.height >= 650.f) {
-        p.pos.y = 650.f - p.height;
+    if (p.pos.y + p.height >= 720.f) {
+        p.pos.y = 720.f - p.height;
         p.velocity.y = 0.f;
         p.onGround = true;
     } else {
