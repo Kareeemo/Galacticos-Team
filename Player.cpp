@@ -1,6 +1,8 @@
 #include "gameglobale.h"
 #include <SFML/Graphics.hpp>
 
+using namespace sf;
+
 namespace {
 constexpr float SPEED = 250.f;
 constexpr float JUMP_VELOCITY = -550.f;
@@ -26,25 +28,25 @@ void playerInit(Player& p, int index) {
     p.inputRight = false;
     p.inputJump = false;
     p.inputAttack = false;
-    p.attackBox = sf::FloatRect({p.position.x, p.position.y}, {0.f, 0.f});
+    p.attackBox = FloatRect({p.position.x, p.position.y}, {0.f, 0.f});
 }
 
 void playerReadInputForIndex(Player& p, int index) {
-    static const sf::Keyboard::Key LEFT_KEYS[MAX_PLAYERS] = {
-        sf::Keyboard::Key::A,
-        sf::Keyboard::Key::Left,
+    static const Keyboard::Key LEFT_KEYS[MAX_PLAYERS] = {
+        Keyboard::Key::A,
+        Keyboard::Key::Left,
     };
-    static const sf::Keyboard::Key RIGHT_KEYS[MAX_PLAYERS] = {
-        sf::Keyboard::Key::D,
-        sf::Keyboard::Key::Right,
+    static const Keyboard::Key RIGHT_KEYS[MAX_PLAYERS] = {
+        Keyboard::Key::D,
+        Keyboard::Key::Right,
     };
-    static const sf::Keyboard::Key JUMP_KEYS[MAX_PLAYERS] = {
-        sf::Keyboard::Key::W,
-        sf::Keyboard::Key::Up,
+    static const Keyboard::Key JUMP_KEYS[MAX_PLAYERS] = {
+        Keyboard::Key::W,
+        Keyboard::Key::Up,
     };
-    static const sf::Keyboard::Key ATTACK_KEYS[MAX_PLAYERS] = {
-        sf::Keyboard::Key::Space,
-        sf::Keyboard::Key::Enter,
+    static const Keyboard::Key ATTACK_KEYS[MAX_PLAYERS] = {
+        Keyboard::Key::Space,
+        Keyboard::Key::Enter,
     };
 
     if (index < 0 || index >= MAX_PLAYERS) {
@@ -55,10 +57,10 @@ void playerReadInputForIndex(Player& p, int index) {
         return;
     }
 
-    p.inputLeft = sf::Keyboard::isKeyPressed(LEFT_KEYS[index]);
-    p.inputRight = sf::Keyboard::isKeyPressed(RIGHT_KEYS[index]);
-    p.inputJump = sf::Keyboard::isKeyPressed(JUMP_KEYS[index]);
-    p.inputAttack = sf::Keyboard::isKeyPressed(ATTACK_KEYS[index]);
+    p.inputLeft = Keyboard::isKeyPressed(LEFT_KEYS[index]);
+    p.inputRight = Keyboard::isKeyPressed(RIGHT_KEYS[index]);
+    p.inputJump = Keyboard::isKeyPressed(JUMP_KEYS[index]);
+    p.inputAttack = Keyboard::isKeyPressed(ATTACK_KEYS[index]);
 }
 
 void playerUpdate(Player& p, float dt) {
@@ -90,7 +92,7 @@ void playerUpdate(Player& p, float dt) {
 
         p.isAttacking = true;
         p.attackTimer = p.attackCooldown;
-        p.attackBox = sf::FloatRect({attackX, attackY}, {ATTACK_BOX_WIDTH, ATTACK_BOX_HEIGHT});
+        p.attackBox = FloatRect({attackX, attackY}, {ATTACK_BOX_WIDTH, ATTACK_BOX_HEIGHT});
     } else {
         p.isAttacking = false;
     }
