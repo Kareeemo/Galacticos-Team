@@ -25,6 +25,7 @@ using namespace sf;
    };
 
    const int MAX_PLATFORMS = 64;
+   const int MAX_PLAYERS = 2;
 
    struct Level{
     Platform platforms[MAX_PLATFORMS];
@@ -38,7 +39,7 @@ using namespace sf;
 
 // Player 
   struct Player{
-      Vec2 position;
+      Vec2 pos;
       Vec2 velocity;
       float width;
       float height;
