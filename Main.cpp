@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include "Physics.h"
 #include "Render.h"
 #include "Player.h"
 #include "gameglobale.h"
@@ -16,11 +17,20 @@ int main() {
         "Stick Fight - Galacticos Team"
     );
     window.setFramerateLimit(60);
+    sf::Clock clock;
 
     while (window.isOpen()) {
+        float dt = clock.restart().asSeconds();
+        if (dt > 0.05f) dt = 0.05f;
+
         while (const auto event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>())
                 window.close();
+        }
+        for (int i = 0; i < 2; i++) {
+            playerReadInputForIndex(players[i], i);
+            playerUpdate(players[i], dt);
+            physicsUpdate(players[i], dt);
         }
         window.clear(sf::Color::Black);
         drawBackground(window);
