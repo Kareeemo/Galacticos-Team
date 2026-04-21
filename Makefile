@@ -1,11 +1,24 @@
-all: compile link
+# Each teammate can override this locally to point to their own SFML install.
+SFML_PATH ?= C:\SFML-3.0.0
 
-compile:
-	g++ Main.cpp -o Main -I"C:\SFML-3.0.0\include" -L"C:\SFML-3.0.0\lib" -DSFML_STATIC -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32
- -lfreetype -lwinmm -lgdi32 -mwindows
+CXX := g++
+CXXFLAGS := -I"$(SFML_PATH)\include" -DSFML_STATIC
+LDFLAGS := -L"$(SFML_PATH)\lib"
+LDLIBS := -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32 -lfreetype -lwinmm -lgdi32
 
-link:
-	g++ Main.cpp -o Main -I"C:\Users\karim\Documents\libraries\SFML-3.0.0\include" -L"C:\Users\karim\Documents\libraries\SFML-3.0.0\lib" -DSFML_STATIC -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32 -lfreetype -lwinmm -lgdi32 -mwindows
+SOURCES := Main.cpp Player.cpp Level.cpp Physics.cpp Render.cpp Ui.cpp
+OBJECTS := $(SOURCES:.cpp=.o)
+TARGET := Main.exe
+
+.PHONY: all clean
+
+all: $(TARGET)
+
+$(TARGET): $(OBJECTS)
+	$(CXX) $(OBJECTS) -o $(TARGET) $(LDFLAGS) $(LDLIBS)
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	-del /Q Main.exe *.o
+	del /Q *.exe *.o 2>nul
