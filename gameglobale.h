@@ -25,6 +25,7 @@ using namespace sf;
    };
 
    const int MAX_PLATFORMS = 64;
+   const int MAX_PLAYERS = 2;
 
    struct Level{
     Platform platforms[MAX_PLATFORMS];
