@@ -38,6 +38,14 @@ void drawHealthBar(RenderWindow& window, Player& p, int playerIndex) {
     const float padding = 15.f;
     const float x = (playerIndex == 0) ? padding : WINDOW_WIDTH - barWidth - padding;
     const float y = padding;
+    static Font font;
+    static bool fontLoaded = false;
+    static bool fontAttempted = false;
+
+    if (!fontAttempted) {
+        fontLoaded = font.openFromFile("assets/ArialNarrow7-9YJ9n.ttf");
+        fontAttempted = true;
+    }
 
     RectangleShape bgBar(Vector2f(barWidth, barHeight));
     bgBar.setPosition(Vector2f(x, y));
@@ -55,6 +63,17 @@ void drawHealthBar(RenderWindow& window, Player& p, int playerIndex) {
     outline.setOutlineColor(Color::White);
     outline.setOutlineThickness(2.f);
     window.draw(outline);
+
+    if (fontLoaded) {
+        const Color playerLabelColors[2] = {
+            Color(70, 130, 255),
+            Color(220, 60, 60)
+        };
+        Text label(font, playerIndex == 0 ? "Player 1" : "Player 2", 16);
+        label.setFillColor(playerLabelColors[playerIndex % 2]);
+        label.setPosition(Vector2f(x, padding - 18.f));
+        window.draw(label);
+    }
 }
 
 void drawBackground(RenderWindow& window) {
