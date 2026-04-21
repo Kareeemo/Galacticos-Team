@@ -32,16 +32,29 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex) {
     window.draw(leg2);
 }
 
-void drawHealthBar(RenderWindow& window, Player& p) {
-    RectangleShape bgBar(Vector2f(60.f, 8.f));
-    bgBar.setFillColor(Color::Red);
-    bgBar.setPosition(Vector2f(p.pos.x - 10.f, p.pos.y - 20.f));
+void drawHealthBar(RenderWindow& window, Player& p, int playerIndex) {
+    const float barWidth = 200.f;
+    const float barHeight = 20.f;
+    const float padding = 15.f;
+    const float x = (playerIndex == 0) ? padding : WINDOW_WIDTH - barWidth - padding;
+    const float y = padding;
+
+    RectangleShape bgBar(Vector2f(barWidth, barHeight));
+    bgBar.setPosition(Vector2f(x, y));
+    bgBar.setFillColor(Color(60, 60, 60));
     window.draw(bgBar);
 
-    RectangleShape healthBar(Vector2f((p.health / (float)p.maxHealth) * 60.f, 8.f));
-    healthBar.setFillColor(Color::Green);
-    healthBar.setPosition(Vector2f(p.pos.x - 10.f, p.pos.y - 20.f));
+    RectangleShape healthBar(Vector2f((p.health / (float)p.maxHealth) * barWidth, barHeight));
+    healthBar.setPosition(Vector2f(x, y));
+    healthBar.setFillColor(p.health > 50 ? Color(80, 200, 80) : Color(220, 60, 60));
     window.draw(healthBar);
+
+    RectangleShape outline(Vector2f(barWidth, barHeight));
+    outline.setPosition(Vector2f(x, y));
+    outline.setFillColor(Color::Transparent);
+    outline.setOutlineColor(Color::White);
+    outline.setOutlineThickness(2.f);
+    window.draw(outline);
 }
 
 void drawBackground(RenderWindow& window) {

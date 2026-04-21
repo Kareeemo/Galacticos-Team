@@ -36,6 +36,8 @@ int main() {
         drawBackground(window);
         for (int i = 0; i < 2; i++)
             drawPlayer(window, players[i], i);
+        for (int i = 0; i < 2; i++)
+            drawHealthBar(window, players[i], i);
         window.display();
     }
     return 0;
