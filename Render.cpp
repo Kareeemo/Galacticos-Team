@@ -2,25 +2,31 @@
 
 using namespace sf;
 
-void drawPlayer(RenderWindow& window, Player& p) {
+void drawPlayer(RenderWindow& window, Player& p, int playerIndex) {
+    Color playerColors[2] = {
+        Color(70, 130, 255),
+        Color(220, 60, 60)
+    };
+    Color col = playerColors[playerIndex % 2];
+
     CircleShape head(20);
-    head.setFillColor(Color::White);
+    head.setFillColor(col);
     head.setPosition(Vector2f(p.pos.x, p.pos.y));
     window.draw(head);
 
     RectangleShape body(Vector2f(4, 50));
-    body.setFillColor(Color::White);
+    body.setFillColor(col);
     body.setPosition(Vector2f(p.pos.x + 18, p.pos.y + 40));
     window.draw(body);
 
     RectangleShape leg1(Vector2f(4, 35));
-    leg1.setFillColor(Color::White);
+    leg1.setFillColor(col);
     leg1.setPosition(Vector2f(p.pos.x + 18, p.pos.y + 90));
     leg1.setRotation(degrees(20));
     window.draw(leg1);
 
     RectangleShape leg2(Vector2f(4, 35));
-    leg2.setFillColor(Color::White);
+    leg2.setFillColor(col);
     leg2.setPosition(Vector2f(p.pos.x + 18, p.pos.y + 90));
     leg2.setRotation(degrees(-20));
     window.draw(leg2);

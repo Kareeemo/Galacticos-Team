@@ -35,7 +35,7 @@ int main() {
         window.clear(sf::Color::Black);
         drawBackground(window);
         for (int i = 0; i < 2; i++)
-            drawPlayer(window, players[i]);
+            drawPlayer(window, players[i], i);
         window.display();
     }
     return 0;

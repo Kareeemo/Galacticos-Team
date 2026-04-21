@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "gameglobale.h"
 
-void drawPlayer(sf::RenderWindow& window, Player& p);
+void drawPlayer(sf::RenderWindow& window, Player& p, int playerIndex);
 void drawHealthBar(sf::RenderWindow& window, Player& p);
 void drawBackground(sf::RenderWindow& window);
 
