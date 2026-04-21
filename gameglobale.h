@@ -9,7 +9,7 @@ using namespace sf;
 
    const int WINDOW_WIDTH = 1600;
    const int WINDOW_HEIGHT = 900;
-   int score = 0;
+   extern int score;
 
    struct Vec2{
     float x, y;
@@ -33,7 +33,7 @@ using namespace sf;
     Vec2 spawnPoints[4];
    };
 
-    std::vector<Level> levels;
+    extern std::vector<Level> levels;
   
 
 // Player 
