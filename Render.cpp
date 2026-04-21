@@ -2,8 +2,6 @@
 
 using namespace sf;
 
-#define pos position
-
 void drawPlayer(RenderWindow& window, Player& p) {
     CircleShape head(20);
     head.setFillColor(Color::White);
@@ -61,5 +59,3 @@ void drawBackground(RenderWindow& window) {
     bg.setFillColor(Color(30, 30, 30));
     window.draw(bg);
 }
-
-#undef pos

@@ -39,7 +39,7 @@ using namespace sf;
 
 // Player 
   struct Player{
-      Vec2 position;
+      Vec2 pos;
       Vec2 velocity;
       float width;
       float height;

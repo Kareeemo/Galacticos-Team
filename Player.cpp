@@ -11,7 +11,7 @@ constexpr float ATTACK_BOX_HEIGHT = 20.f;
 }
 
 void playerInit(Player& p, int index) {
-    p.position = {200.f + index * 300.f, 300.f};
+    p.pos = {200.f + index * 300.f, 300.f};
     p.velocity = {0.f, 0.f};
     p.width = 30.f;
     p.height = 60.f;
@@ -28,7 +28,7 @@ void playerInit(Player& p, int index) {
     p.inputRight = false;
     p.inputJump = false;
     p.inputAttack = false;
-    p.attackBox = FloatRect({p.position.x, p.position.y}, {0.f, 0.f});
+    p.attackBox = FloatRect({p.pos.x, p.pos.y}, {0.f, 0.f});
 }
 
 void playerReadInputForIndex(Player& p, int index) {
@@ -86,9 +86,9 @@ void playerUpdate(Player& p, float dt) {
     p.attackTimer -= dt;
     if (p.inputAttack && p.attackTimer <= 0.f) {
         const float attackX = p.facingRight
-            ? p.position.x + p.width
-            : p.position.x - ATTACK_BOX_WIDTH;
-        const float attackY = p.position.y + (p.height - ATTACK_BOX_HEIGHT) * 0.5f;
+            ? p.pos.x + p.width
+            : p.pos.x - ATTACK_BOX_WIDTH;
+        const float attackY = p.pos.y + (p.height - ATTACK_BOX_HEIGHT) * 0.5f;
 
         p.isAttacking = true;
         p.attackTimer = p.attackCooldown;
