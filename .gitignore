@@ -15,5 +15,6 @@ bin/
 
 # Temp
 *.tmp
-*.dll
-*.exe
+
+# Windows binaries and build artifacts
+*.a
