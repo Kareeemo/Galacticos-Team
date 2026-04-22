@@ -27,11 +27,14 @@ int main() {
             if (event->is<sf::Event::Closed>())
                 window.close();
         }
+
         for (int i = 0; i < 2; i++) {
             playerReadInputForIndex(players[i], i);
             playerUpdate(players[i], dt);
             physicsUpdate(players[i], dt);
         }
+        resolvePlayerCollision(players[0], players[1]);
+
         window.clear(sf::Color::Black);
         drawBackground(window);
         for (int i = 0; i < 2; i++)
