@@ -3,6 +3,7 @@
 #include "Render.h"
 #include "Player.h"
 #include "gameglobale.h"
+#include "Ui.h"
 
 int score = 0;
 std::vector<Level> levels;
@@ -37,10 +38,13 @@ int main() {
 
         window.clear(sf::Color::Black);
         drawBackground(window);
-        for (int i = 0; i < 2; i++)
+
+        for (int i = 0; i < 2; i++) {
             drawPlayer(window, players[i], i);
-        for (int i = 0; i < 2; i++)
-            drawHealthBar(window, players[i], i);
+        }
+
+        drawHealthBars(window, players);
+
         window.display();
     }
     return 0;
