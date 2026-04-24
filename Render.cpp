@@ -3,6 +3,14 @@
 
 using namespace sf;
 
+namespace {
+constexpr float FRAME_WIDTH = 96.f;
+constexpr float FRAME_HEIGHT = 96.f;
+constexpr float SPRITE_SCALE = 2.0f;
+constexpr float DRAW_OFFSET_X = 80.f;
+constexpr float DRAW_OFFSET_Y = 105.f;
+}
+
 static void drawStickFigure(RenderWindow& window, Player& p, int playerIndex) {
     Color playerColors[2] = {
         Color(70, 130, 255),
@@ -33,12 +41,41 @@ static void drawStickFigure(RenderWindow& window, Player& p, int playerIndex) {
     window.draw(leg2);
 }
 
+static void drawAnimatedSprite(RenderWindow& window, Texture& texture, int frame, Player& p) {
+    Sprite sprite(texture);
+    sprite.setTextureRect(IntRect({frame * static_cast<int>(FRAME_WIDTH), 0}, {static_cast<int>(FRAME_WIDTH), static_cast<int>(FRAME_HEIGHT)}));
+
+    if (p.facingRight) {
+        sprite.setOrigin({0.f, 0.f});
+        sprite.setScale({SPRITE_SCALE, SPRITE_SCALE});
+        sprite.setPosition({p.pos.x - DRAW_OFFSET_X, p.pos.y - DRAW_OFFSET_Y});
+    } else {
+        sprite.setOrigin({FRAME_WIDTH, 0.f});
+        sprite.setScale({-SPRITE_SCALE, SPRITE_SCALE});
+        sprite.setPosition({p.pos.x + p.width + DRAW_OFFSET_X, p.pos.y - DRAW_OFFSET_Y});
+    }
+
+    window.draw(sprite);
+}
+
 void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
     static Texture runTexture;
     static bool triedLoadRunTexture = false;
     static bool runTextureLoaded = false;
+    static Texture idleTexture;
+    static bool triedLoadIdleTexture = false;
+    static bool idleTextureLoaded = false;
+    static Texture attackTexture;
+    static bool triedLoadAttackTexture = false;
+    static bool attackTextureLoaded = false;
     static float runAnimTimer = 0.f;
     static int runFrame = 0;
+    static float idleAnimTimer = 0.f;
+    static int idleFrame = 0;
+    static float attackAnimTimer = 0.f;
+    static int attackFrame = 0;
+    static int drawCallsThisFrame = 0;
+    static bool attackUpdatedThisFrame = false;
 
     if (!triedLoadRunTexture) {
         runTextureLoaded = runTexture.loadFromFile("assets/Sprites/RUN.png");
@@ -48,34 +85,82 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
         triedLoadRunTexture = true;
     }
 
-    if (playerIndex == 0) {
-        const float frameDuration = 0.06f;
+    if (!triedLoadIdleTexture) {
+        idleTextureLoaded = idleTexture.loadFromFile("assets/Sprites/IDLE.png");
+        if (!idleTextureLoaded) {
+            idleTextureLoaded = idleTexture.loadFromFile("assets/sprites/IDLE.png");
+        }
+        triedLoadIdleTexture = true;
+    }
+
+    if (!triedLoadAttackTexture) {
+        attackTextureLoaded = attackTexture.loadFromFile("assets/Sprites/ATTACK 1.png");
+        if (!attackTextureLoaded) {
+            attackTextureLoaded = attackTexture.loadFromFile("assets/sprites/ATTACK 1.png");
+        }
+        triedLoadAttackTexture = true;
+    }
+
+    if (drawCallsThisFrame == 0) {
+        const float runFrameDuration = 0.06f;
+        const float idleFrameDuration = 0.10f;
         runAnimTimer += dt;
-        while (runAnimTimer >= frameDuration) {
-            runAnimTimer -= frameDuration;
+        idleAnimTimer += dt;
+        while (runAnimTimer >= runFrameDuration) {
+            runAnimTimer -= runFrameDuration;
             runFrame = (runFrame + 1) % 16;
+        }
+        while (idleAnimTimer >= idleFrameDuration) {
+            idleAnimTimer -= idleFrameDuration;
+            idleFrame = (idleFrame + 1) % 10;
+        }
+        attackUpdatedThisFrame = false;
+    }
+
+    if (p.isAttacking && !attackUpdatedThisFrame) {
+        const float attackFrameDuration = 0.05f;
+        int attackFrameCount = 7;
+        if (attackTextureLoaded) {
+            const unsigned int textureWidth = attackTexture.getSize().x;
+            if (textureWidth >= static_cast<unsigned int>(FRAME_WIDTH)) {
+                attackFrameCount = static_cast<int>(textureWidth / static_cast<unsigned int>(FRAME_WIDTH));
+            }
+        }
+
+        attackAnimTimer += dt;
+        while (attackAnimTimer >= attackFrameDuration) {
+            attackAnimTimer -= attackFrameDuration;
+            attackFrame = (attackFrame + 1) % attackFrameCount;
+        }
+        attackUpdatedThisFrame = true;
+    }
+
+    if (!p.isAlive) {
+        drawStickFigure(window, p, playerIndex);
+    } else if (p.isAttacking) {
+        if (attackTextureLoaded) {
+            drawAnimatedSprite(window, attackTexture, attackFrame, p);
+        } else {
+            drawStickFigure(window, p, playerIndex);
+        }
+    } else if (std::abs(p.velocity.x) > 20.f) {
+        if (runTextureLoaded) {
+            drawAnimatedSprite(window, runTexture, runFrame, p);
+        } else {
+            drawStickFigure(window, p, playerIndex);
+        }
+    } else {
+        if (idleTextureLoaded) {
+            drawAnimatedSprite(window, idleTexture, idleFrame, p);
+        } else {
+            drawStickFigure(window, p, playerIndex);
         }
     }
 
-    const bool isRunning = p.isAlive && std::abs(p.velocity.x) > 20.f;
-    if (!runTextureLoaded || !isRunning) {
-        drawStickFigure(window, p, playerIndex);
-        return;
+    drawCallsThisFrame++;
+    if (drawCallsThisFrame >= MAX_PLAYERS) {
+        drawCallsThisFrame = 0;
     }
-
-    Sprite runSprite(runTexture);
-    runSprite.setTextureRect(IntRect({runFrame * 96, 0}, {96, 96}));
-    runSprite.setPosition({p.pos.x - 33.f, p.pos.y - 25.f});
-
-    if (p.facingRight) {
-        runSprite.setScale({1.2f, 1.2f});
-    } else {
-        runSprite.setOrigin({48.f, 0.f});
-        runSprite.setPosition({p.pos.x + 15.f, p.pos.y - 25.f});
-        runSprite.setScale({-1.2f, 1.2f});
-    }
-
-    window.draw(runSprite);
 }
 
 void drawBackground(RenderWindow& window) {
