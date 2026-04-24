@@ -3,7 +3,6 @@
 #include "Render.h"
 #include "Player.h"
 #include "gameglobale.h"
-#include "Ui.h"
 
 int score = 0;
 std::vector<Level> levels;
@@ -35,6 +34,8 @@ int main() {
             physicsUpdate(players[i], dt);
         }
         resolvePlayerCollision(players[0], players[1]);
+        handleCombat(players[0], players[1]);
+        handleCombat(players[1], players[0]);
 
         window.clear(sf::Color::Black);
         drawBackground(window);
