@@ -9,7 +9,7 @@ constexpr float FRAME_HEIGHT = 96.f;
 constexpr float SPRITE_SCALE = 3.0f;
 constexpr float SPRITE_CENTER_X = FRAME_WIDTH * 0.5f;
 constexpr float SPRITE_FEET_Y = FRAME_HEIGHT;
-constexpr float FEET_OFFSET_Y = 8.f;
+constexpr float FEET_OFFSET_Y = 28.f;
 }
 
 static void drawStickFigure(RenderWindow& window, Player& p, int playerIndex) {
@@ -73,10 +73,10 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
     static int runFrame = 0;
     static float idleAnimTimer = 0.f;
     static int idleFrame = 0;
-    static float attackAnimTimer = 0.f;
-    static int attackFrame = 0;
+    static bool attackVisualActive[MAX_PLAYERS] = {false};
+    static int attackVisualFrame[MAX_PLAYERS] = {0};
+    static float attackVisualTimer[MAX_PLAYERS] = {0.f};
     static int drawCallsThisFrame = 0;
-    static bool attackUpdatedThisFrame = false;
 
     if (!triedLoadRunTexture) {
         runTextureLoaded = runTexture.loadFromFile("assets/Sprites/RUN.png");
@@ -115,10 +115,15 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
             idleAnimTimer -= idleFrameDuration;
             idleFrame = (idleFrame + 1) % 10;
         }
-        attackUpdatedThisFrame = false;
     }
 
-    if (p.isAttacking && !attackUpdatedThisFrame) {
+    if (p.isAttacking) {
+        attackVisualActive[playerIndex] = true;
+        attackVisualFrame[playerIndex] = 0;
+        attackVisualTimer[playerIndex] = 0.f;
+    }
+
+    if (attackVisualActive[playerIndex]) {
         const float attackFrameDuration = 0.05f;
         int attackFrameCount = 7;
         if (attackTextureLoaded) {
@@ -128,19 +133,24 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
             }
         }
 
-        attackAnimTimer += dt;
-        while (attackAnimTimer >= attackFrameDuration) {
-            attackAnimTimer -= attackFrameDuration;
-            attackFrame = (attackFrame + 1) % attackFrameCount;
+        attackVisualTimer[playerIndex] += dt;
+        while (attackVisualTimer[playerIndex] >= attackFrameDuration) {
+            attackVisualTimer[playerIndex] -= attackFrameDuration;
+            attackVisualFrame[playerIndex]++;
         }
-        attackUpdatedThisFrame = true;
+
+        if (attackVisualFrame[playerIndex] >= attackFrameCount) {
+            attackVisualActive[playerIndex] = false;
+            attackVisualFrame[playerIndex] = 0;
+            attackVisualTimer[playerIndex] = 0.f;
+        }
     }
 
     if (!p.isAlive) {
         drawStickFigure(window, p, playerIndex);
-    } else if (p.isAttacking) {
+    } else if (attackVisualActive[playerIndex]) {
         if (attackTextureLoaded) {
-            drawAnimatedSprite(window, attackTexture, attackFrame, p);
+            drawAnimatedSprite(window, attackTexture, attackVisualFrame[playerIndex], p);
         } else {
             drawStickFigure(window, p, playerIndex);
         }
