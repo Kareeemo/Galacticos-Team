@@ -4,13 +4,14 @@
 using namespace sf;
 
 namespace {
-const float GRAVITY = 1200.f;
+const float GRAVITY     = 1200.f;
+const float KNOCKBACK_X = 400.f;
+const float KNOCKBACK_Y = -250.f;
+const int   ATTACK_DMG  = 10;
 }
 
 void physicsUpdate(Player& p, float dt) {
-    if (!p.isAlive) {
-        return;
-    }
+    if (!p.isAlive) return;
 
     p.velocity.y += GRAVITY * dt;
 
@@ -18,19 +19,15 @@ void physicsUpdate(Player& p, float dt) {
     p.pos.y += p.velocity.y * dt;
 
     if (p.pos.y + p.height >= 720.f) {
-        p.pos.y = 720.f - p.height;
+        p.pos.y      = 720.f - p.height;
         p.velocity.y = 0.f;
-        p.onGround = true;
+        p.onGround   = true;
     } else {
         p.onGround = false;
     }
 
-    if (p.pos.x < 0.f) {
-        p.pos.x = 0.f;
-    }
-    if (p.pos.x + p.width > WINDOW_WIDTH) {
-        p.pos.x = WINDOW_WIDTH - p.width;
-    }
+    if (p.pos.x < 0.f)                   p.pos.x = 0.f;
+    if (p.pos.x + p.width > WINDOW_WIDTH) p.pos.x = WINDOW_WIDTH - p.width;
 }
 
 void resolvePlayerCollision(Player& a, Player& b) {
@@ -73,4 +70,25 @@ void resolvePlayerCollision(Player& a, Player& b) {
             a.onGround = true;
         }
     }
+}
+
+void handleCombat(Player& attacker, Player& defender) {
+    if (!attacker.isAttacking || !attacker.isAlive || !defender.isAlive)
+        return;
+
+    FloatRect defenderRect({defender.pos.x, defender.pos.y},
+                           {defender.width,  defender.height});
+
+    if (!attacker.attackBox.findIntersection(defenderRect))
+        return;
+
+    defender.health -= ATTACK_DMG;
+    if (defender.health <= 0) {
+        defender.health  = 0;
+        defender.isAlive = false;
+    }
+
+    defender.velocity.x = attacker.facingRight ? +KNOCKBACK_X : -KNOCKBACK_X;
+    defender.velocity.y = KNOCKBACK_Y;
+    defender.onGround   = false;
 }
