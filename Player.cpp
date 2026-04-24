@@ -45,8 +45,8 @@ void playerReadInputForIndex(Player& p, int index) {
         Keyboard::Key::Up,
     };
     static const Keyboard::Key ATTACK_KEYS[MAX_PLAYERS] = {
-        Keyboard::Key::Space,
-        Keyboard::Key::Enter,
+        Keyboard::Key::C,
+        Keyboard::Key::N,
     };
 
     if (index < 0 || index >= MAX_PLAYERS) {
@@ -83,7 +83,10 @@ void playerUpdate(Player& p, float dt) {
         p.onGround = false;
     }
 
-    p.attackTimer -= dt;
+    if (p.attackTimer > 0.f) {
+        p.attackTimer -= dt;
+    }
+
     if (p.inputAttack && p.attackTimer <= 0.f) {
         const float attackX = p.facingRight
             ? p.pos.x + p.width
@@ -95,5 +98,6 @@ void playerUpdate(Player& p, float dt) {
         p.attackBox = FloatRect({attackX, attackY}, {ATTACK_BOX_WIDTH, ATTACK_BOX_HEIGHT});
     } else {
         p.isAttacking = false;
+        p.attackBox = FloatRect({p.pos.x, p.pos.y}, {0.f, 0.f});
     }
 }
