@@ -6,9 +6,10 @@ using namespace sf;
 namespace {
 constexpr float FRAME_WIDTH = 96.f;
 constexpr float FRAME_HEIGHT = 96.f;
-constexpr float SPRITE_SCALE = 2.0f;
-constexpr float DRAW_OFFSET_X = 80.f;
-constexpr float DRAW_OFFSET_Y = 105.f;
+constexpr float SPRITE_SCALE = 3.0f;
+constexpr float SPRITE_CENTER_X = FRAME_WIDTH * 0.5f;
+constexpr float SPRITE_FEET_Y = FRAME_HEIGHT;
+constexpr float FEET_OFFSET_Y = 8.f;
 }
 
 static void drawStickFigure(RenderWindow& window, Player& p, int playerIndex) {
@@ -44,15 +45,15 @@ static void drawStickFigure(RenderWindow& window, Player& p, int playerIndex) {
 static void drawAnimatedSprite(RenderWindow& window, Texture& texture, int frame, Player& p) {
     Sprite sprite(texture);
     sprite.setTextureRect(IntRect({frame * static_cast<int>(FRAME_WIDTH), 0}, {static_cast<int>(FRAME_WIDTH), static_cast<int>(FRAME_HEIGHT)}));
+    const float PLAYER_CENTER_X = p.pos.x + (p.width * 0.5f);
+    const float PLAYER_FEET_Y = p.pos.y + p.height;
 
+    sprite.setOrigin({SPRITE_CENTER_X, SPRITE_FEET_Y});
+    sprite.setPosition({PLAYER_CENTER_X, PLAYER_FEET_Y + FEET_OFFSET_Y});
     if (p.facingRight) {
-        sprite.setOrigin({0.f, 0.f});
         sprite.setScale({SPRITE_SCALE, SPRITE_SCALE});
-        sprite.setPosition({p.pos.x - DRAW_OFFSET_X, p.pos.y - DRAW_OFFSET_Y});
     } else {
-        sprite.setOrigin({FRAME_WIDTH, 0.f});
         sprite.setScale({-SPRITE_SCALE, SPRITE_SCALE});
-        sprite.setPosition({p.pos.x + p.width + DRAW_OFFSET_X, p.pos.y - DRAW_OFFSET_Y});
     }
 
     window.draw(sprite);
