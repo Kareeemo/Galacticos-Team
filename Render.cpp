@@ -9,7 +9,7 @@ constexpr float FRAME_HEIGHT = 96.f;
 constexpr float SPRITE_SCALE = 3.0f;
 constexpr float SPRITE_CENTER_X = FRAME_WIDTH * 0.5f;
 constexpr float SPRITE_FEET_Y = FRAME_HEIGHT;
-constexpr float FEET_OFFSET_Y = 90.f;
+constexpr float FEET_OFFSET_Y = 116.f;
 }
 
 static void drawStickFigure(RenderWindow& window, Player& p, int playerIndex) {
