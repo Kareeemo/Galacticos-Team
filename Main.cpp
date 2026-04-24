@@ -40,7 +40,7 @@ int main() {
         drawBackground(window);
 
         for (int i = 0; i < 2; i++) {
-            drawPlayer(window, players[i], i);
+            drawPlayer(window, players[i], i, dt);
         }
 
         drawHealthBars(window, players);
