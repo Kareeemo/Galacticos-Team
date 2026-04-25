@@ -7,9 +7,9 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "C:\\Users\\karim\\Documents\\libraries\\SFML-3.0.0\\include",
+                "C:\\SFML-3.0.0\\include",
                 "${file}",
-                "-LC:\\Users\\karim\\Documents\\libraries\\SFML-3.0.0\\lib",
+                "-LC:\\SFML-3.0.0\\lib",
                 "-lsfml-graphics",
                 "-lsfml-window",
                 "-lsfml-system",

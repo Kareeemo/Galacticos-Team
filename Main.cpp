@@ -1,16 +1,19 @@
 #include <SFML/Graphics.hpp>
 #include "Physics.h"
+#include "Level.h"
 #include "Render.h"
 #include "Player.h"
+#include "UI.h"
 #include "gameglobale.h"
 
 int score = 0;
 std::vector<Level> levels;
 
 int main() {
+    Level currentLevel;
     Player players[2];
-    playerInit(players[0], 0);
-    playerInit(players[1], 1);
+    playerInit(players[0], 0, currentLevel);
+    playerInit(players[1], 1, currentLevel);
 
     sf::RenderWindow window(
         sf::VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}),
@@ -27,17 +30,28 @@ int main() {
             if (event->is<sf::Event::Closed>())
                 window.close();
         }
+
         for (int i = 0; i < 2; i++) {
             playerReadInputForIndex(players[i], i);
             playerUpdate(players[i], dt);
             physicsUpdate(players[i], dt);
         }
+        resolvePlayerCollision(players[0], players[1]);
+        handleCombat(players[0], players[1]);
+        handleCombat(players[1], players[0]);
+
         window.clear(sf::Color::Black);
         drawBackground(window);
-        for (int i = 0; i < 2; i++)
-            drawPlayer(window, players[i], i);
-        for (int i = 0; i < 2; i++)
-            drawHealthBar(window, players[i], i);
+
+        loadLevel(currentLevel, 1);
+        drawLevel(window, currentLevel);
+
+        for (int i = 0; i < 2; i++) {
+            drawPlayer(window, players[i], i, dt);
+        }
+
+        drawHealthBars(window, players);
+
         window.display();
     }
     return 0;

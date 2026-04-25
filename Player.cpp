@@ -1,4 +1,5 @@
 #include "gameglobale.h"
+#include "Level.h"
 #include <SFML/Graphics.hpp>
 
 using namespace sf;
@@ -10,28 +11,28 @@ constexpr float ATTACK_BOX_WIDTH = 40.f;
 constexpr float ATTACK_BOX_HEIGHT = 20.f;
 }
 
-void playerInit(Player& p, int index) {
-    p.pos = {200.f + index * 300.f, 300.f};
-    p.velocity = {0.f, 0.f};
-    p.width = 30.f;
-    p.height = 60.f;
-    p.health = 100;
-    p.maxHealth = 100;
-    p.isAlive = true;
-    p.onGround = false;
-    p.facingRight = (index % 2 == 0);
-    p.attackCooldown = 0.4f;
-    p.attackTimer = 0.f;
-    p.isAttacking = false;
-    p.score = 0;
-    p.inputLeft = false;
-    p.inputRight = false;
-    p.inputJump = false;
-    p.inputAttack = false;
-    p.attackBox = FloatRect({p.pos.x, p.pos.y}, {0.f, 0.f});
+void playerInit(Player& player, int index, const Level& level) {
+    player.pos = getSpawnPoint(level, index);
+    player.velocity = {0.f, 0.f};
+    player.width = 30.f;
+    player.height = 60.f;
+    player.health = 100;
+    player.maxHealth = 100;
+    player.isAlive = true;
+    player.onGround = false;
+    player.facingRight = (index % 2 == 0);
+    player.attackCooldown = 0.4f;
+    player.attackTimer = 0.f;
+    player.isAttacking = false;
+    player.score = 0;
+    player.inputLeft = false;
+    player.inputRight = false;
+    player.inputJump = false;
+    player.inputAttack = false;
+    player.attackBox = FloatRect({player.pos.x, player.pos.y}, {0.f, 0.f});
 }
 
-void playerReadInputForIndex(Player& p, int index) {
+void playerReadInputForIndex(Player& player, int index) {
     static const Keyboard::Key LEFT_KEYS[MAX_PLAYERS] = {
         Keyboard::Key::A,
         Keyboard::Key::Left,
@@ -45,55 +46,59 @@ void playerReadInputForIndex(Player& p, int index) {
         Keyboard::Key::Up,
     };
     static const Keyboard::Key ATTACK_KEYS[MAX_PLAYERS] = {
-        Keyboard::Key::Space,
-        Keyboard::Key::Enter,
+        Keyboard::Key::C,
+        Keyboard::Key::N,
     };
 
     if (index < 0 || index >= MAX_PLAYERS) {
-        p.inputLeft = false;
-        p.inputRight = false;
-        p.inputJump = false;
-        p.inputAttack = false;
+        player.inputLeft = false;
+        player.inputRight = false;
+        player.inputJump = false;
+        player.inputAttack = false;
         return;
     }
 
-    p.inputLeft = Keyboard::isKeyPressed(LEFT_KEYS[index]);
-    p.inputRight = Keyboard::isKeyPressed(RIGHT_KEYS[index]);
-    p.inputJump = Keyboard::isKeyPressed(JUMP_KEYS[index]);
-    p.inputAttack = Keyboard::isKeyPressed(ATTACK_KEYS[index]);
+    player.inputLeft = Keyboard::isKeyPressed(LEFT_KEYS[index]);
+    player.inputRight = Keyboard::isKeyPressed(RIGHT_KEYS[index]);
+    player.inputJump = Keyboard::isKeyPressed(JUMP_KEYS[index]);
+    player.inputAttack = Keyboard::isKeyPressed(ATTACK_KEYS[index]);
 }
 
-void playerUpdate(Player& p, float dt) {
-    if (!p.isAlive) {
+void playerUpdate(Player& player, float dt) {
+    if (!player.isAlive) {
         return;
     }
 
-    if (p.inputLeft && !p.inputRight) {
-        p.velocity.x = -SPEED;
-        p.facingRight = false;
-    } else if (p.inputRight && !p.inputLeft) {
-        p.velocity.x = SPEED;
-        p.facingRight = true;
+    if (player.inputLeft && !player.inputRight) {
+        player.velocity.x = -SPEED;
+        player.facingRight = false;
+    } else if (player.inputRight && !player.inputLeft) {
+        player.velocity.x = SPEED;
+        player.facingRight = true;
     } else {
-        p.velocity.x *= 0.75f;
+        player.velocity.x *= 0.75f;
     }
 
-    if (p.inputJump && p.onGround) {
-        p.velocity.y = JUMP_VELOCITY;
-        p.onGround = false;
+    if (player.inputJump && player.onGround) {
+        player.velocity.y = JUMP_VELOCITY;
+        player.onGround = false;
     }
 
-    p.attackTimer -= dt;
-    if (p.inputAttack && p.attackTimer <= 0.f) {
-        const float attackX = p.facingRight
-            ? p.pos.x + p.width
-            : p.pos.x - ATTACK_BOX_WIDTH;
-        const float attackY = p.pos.y + (p.height - ATTACK_BOX_HEIGHT) * 0.5f;
+    if (player.attackTimer > 0.f) {
+        player.attackTimer -= dt;
+    }
 
-        p.isAttacking = true;
-        p.attackTimer = p.attackCooldown;
-        p.attackBox = FloatRect({attackX, attackY}, {ATTACK_BOX_WIDTH, ATTACK_BOX_HEIGHT});
+    if (player.inputAttack && player.attackTimer <= 0.f) {
+        const float attackX = player.facingRight
+            ? player.pos.x + player.width
+            : player.pos.x - ATTACK_BOX_WIDTH;
+        const float attackY = player.pos.y + (player.height - ATTACK_BOX_HEIGHT) * 0.5f;
+
+        player.isAttacking = true;
+        player.attackTimer = player.attackCooldown;
+        player.attackBox = FloatRect({attackX, attackY}, {ATTACK_BOX_WIDTH, ATTACK_BOX_HEIGHT});
     } else {
-        p.isAttacking = false;
+        player.isAttacking = false;
+        player.attackBox = FloatRect({player.pos.x, player.pos.y}, {0.f, 0.f});
     }
 }

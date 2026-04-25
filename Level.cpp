@@ -11,26 +11,23 @@ static void addPlatform(Level& level, float x, float y, float width, float heigh
 
 void loadLevel(Level& level, int levelId) {
     level.platformCount = 0;
-    // level.width  = 1280.f;
-    // level.height = 720.f;
+    level.width  = 1280.f;
+    level.height = 720.f;
 
     sf::Color ground = sf::Color(80,  80,  90);
     sf::Color mid    = sf::Color(100, 110, 130);
 
     if (levelId == 1) {
-        addPlatform(level, 0,    680, 1280, 40, ground); // floor
-        addPlatform(level, 0,    0,   20,  720, ground); // left wall
-        addPlatform(level, 1260, 0,   20,  720, ground); // right wall
+        addPlatform(level, 0,    300, 1920, 40, ground); // floor
         addPlatform(level, 490,  400, 300, 20,  mid);    // center
         addPlatform(level, 150,  520, 200, 20,  mid);    // left mid
         addPlatform(level, 930,  520, 200, 20,  mid);    // right mid
         addPlatform(level, 200,  280, 160, 20,  mid);    // high left
         addPlatform(level, 920,  280, 160, 20,  mid);    // high right
 
-        level.spawnPoints[0] = {120.f,  620.f};
-        level.spawnPoints[1] = {400.f,  620.f};
-        level.spawnPoints[2] = {780.f,  620.f};
-        level.spawnPoints[3] = {1060.f, 620.f};
+        level.spawnPoints[0] = {300.f, 200.f};
+        level.spawnPoints[1] = {1000.f, 200.f};
+
     }
 }
 

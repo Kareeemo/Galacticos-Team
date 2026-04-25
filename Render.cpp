@@ -1,8 +1,19 @@
 #include "Render.h"
+#include <cmath>
+#include "Level.h"
 
 using namespace sf;
 
-void drawPlayer(RenderWindow& window, Player& p, int playerIndex) {
+namespace {
+constexpr float FRAME_WIDTH = 96.f;
+constexpr float FRAME_HEIGHT = 96.f;
+constexpr float SPRITE_SCALE = 3.0f;
+constexpr float SPRITE_CENTER_X = FRAME_WIDTH * 0.5f;
+constexpr float SPRITE_FEET_Y = FRAME_HEIGHT;
+constexpr float FEET_OFFSET_Y = 116.f;
+}
+
+static void drawStickFigure(RenderWindow& window, Player& p, int playerIndex) {
     Color playerColors[2] = {
         Color(70, 130, 255),
         Color(220, 60, 60)
@@ -32,47 +43,135 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex) {
     window.draw(leg2);
 }
 
-void drawHealthBar(RenderWindow& window, Player& p, int playerIndex) {
-    const float barWidth = 200.f;
-    const float barHeight = 20.f;
-    const float padding = 15.f;
-    const float x = (playerIndex == 0) ? padding : WINDOW_WIDTH - barWidth - padding;
-    const float y = padding;
-    static Font font;
-    static bool fontLoaded = false;
-    static bool fontAttempted = false;
+static void drawAnimatedSprite(RenderWindow& window, Texture& texture, int frame, Player& p) {
+    Sprite sprite(texture);
+    sprite.setTextureRect(IntRect({frame * static_cast<int>(FRAME_WIDTH), 0}, {static_cast<int>(FRAME_WIDTH), static_cast<int>(FRAME_HEIGHT)}));
+    const float PLAYER_CENTER_X = p.pos.x + (p.width * 0.5f);
+    const float PLAYER_FEET_Y = p.pos.y + p.height;
 
-    if (!fontAttempted) {
-        fontLoaded = font.openFromFile("assets/ArialNarrow7-9YJ9n.ttf");
-        fontAttempted = true;
+    sprite.setOrigin({SPRITE_CENTER_X, SPRITE_FEET_Y});
+    sprite.setPosition({PLAYER_CENTER_X, PLAYER_FEET_Y + FEET_OFFSET_Y});
+    if (p.facingRight) {
+        sprite.setScale({SPRITE_SCALE, SPRITE_SCALE});
+    } else {
+        sprite.setScale({-SPRITE_SCALE, SPRITE_SCALE});
     }
 
-    RectangleShape bgBar(Vector2f(barWidth, barHeight));
-    bgBar.setPosition(Vector2f(x, y));
-    bgBar.setFillColor(Color(60, 60, 60));
-    window.draw(bgBar);
+    window.draw(sprite);
+}
 
-    RectangleShape healthBar(Vector2f((p.health / (float)p.maxHealth) * barWidth, barHeight));
-    healthBar.setPosition(Vector2f(x, y));
-    healthBar.setFillColor(p.health > 50 ? Color(80, 200, 80) : Color(220, 60, 60));
-    window.draw(healthBar);
+void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
+    static Texture runTexture;
+    static bool triedLoadRunTexture = false;
+    static bool runTextureLoaded = false;
+    static Texture idleTexture;
+    static bool triedLoadIdleTexture = false;
+    static bool idleTextureLoaded = false;
+    static Texture attackTexture;
+    static bool triedLoadAttackTexture = false;
+    static bool attackTextureLoaded = false;
+    static float runAnimTimer = 0.f;
+    static int runFrame = 0;
+    static float idleAnimTimer = 0.f;
+    static int idleFrame = 0;
+    static bool attackVisualActive[MAX_PLAYERS] = {false};
+    static int attackVisualFrame[MAX_PLAYERS] = {0};
+    static float attackVisualTimer[MAX_PLAYERS] = {0.f};
+    static int drawCallsThisFrame = 0;
 
-    RectangleShape outline(Vector2f(barWidth, barHeight));
-    outline.setPosition(Vector2f(x, y));
-    outline.setFillColor(Color::Transparent);
-    outline.setOutlineColor(Color::White);
-    outline.setOutlineThickness(2.f);
-    window.draw(outline);
+    if (!triedLoadRunTexture) {
+        runTextureLoaded = runTexture.loadFromFile("assets/Sprites/RUN.png");
+        if (!runTextureLoaded) {
+            runTextureLoaded = runTexture.loadFromFile("assets/sprites/RUN.png");
+        }
+        triedLoadRunTexture = true;
+    }
 
-    if (fontLoaded) {
-        const Color playerLabelColors[2] = {
-            Color(70, 130, 255),
-            Color(220, 60, 60)
-        };
-        Text label(font, playerIndex == 0 ? "Player 1" : "Player 2", 16);
-        label.setFillColor(playerLabelColors[playerIndex % 2]);
-        label.setPosition(Vector2f(x, padding - 18.f));
-        window.draw(label);
+    if (!triedLoadIdleTexture) {
+        idleTextureLoaded = idleTexture.loadFromFile("assets/Sprites/IDLE.png");
+        if (!idleTextureLoaded) {
+            idleTextureLoaded = idleTexture.loadFromFile("assets/sprites/IDLE.png");
+        }
+        triedLoadIdleTexture = true;
+    }
+
+    if (!triedLoadAttackTexture) {
+        attackTextureLoaded = attackTexture.loadFromFile("assets/Sprites/ATTACK 1.png");
+        if (!attackTextureLoaded) {
+            attackTextureLoaded = attackTexture.loadFromFile("assets/sprites/ATTACK 1.png");
+        }
+        triedLoadAttackTexture = true;
+    }
+
+    if (drawCallsThisFrame == 0) {
+        const float runFrameDuration = 0.06f;
+        const float idleFrameDuration = 0.10f;
+        runAnimTimer += dt;
+        idleAnimTimer += dt;
+        while (runAnimTimer >= runFrameDuration) {
+            runAnimTimer -= runFrameDuration;
+            runFrame = (runFrame + 1) % 16;
+        }
+        while (idleAnimTimer >= idleFrameDuration) {
+            idleAnimTimer -= idleFrameDuration;
+            idleFrame = (idleFrame + 1) % 10;
+        }
+    }
+
+    if (p.isAttacking) {
+        attackVisualActive[playerIndex] = true;
+        attackVisualFrame[playerIndex] = 0;
+        attackVisualTimer[playerIndex] = 0.f;
+    }
+
+    if (attackVisualActive[playerIndex]) {
+        const float attackFrameDuration = 0.05f;
+        int attackFrameCount = 7;
+        if (attackTextureLoaded) {
+            const unsigned int textureWidth = attackTexture.getSize().x;
+            if (textureWidth >= static_cast<unsigned int>(FRAME_WIDTH)) {
+                attackFrameCount = static_cast<int>(textureWidth / static_cast<unsigned int>(FRAME_WIDTH));
+            }
+        }
+
+        attackVisualTimer[playerIndex] += dt;
+        while (attackVisualTimer[playerIndex] >= attackFrameDuration) {
+            attackVisualTimer[playerIndex] -= attackFrameDuration;
+            attackVisualFrame[playerIndex]++;
+        }
+
+        if (attackVisualFrame[playerIndex] >= attackFrameCount) {
+            attackVisualActive[playerIndex] = false;
+            attackVisualFrame[playerIndex] = 0;
+            attackVisualTimer[playerIndex] = 0.f;
+        }
+    }
+
+    if (!p.isAlive) {
+        drawStickFigure(window, p, playerIndex);
+    } else if (attackVisualActive[playerIndex]) {
+        if (attackTextureLoaded) {
+            drawAnimatedSprite(window, attackTexture, attackVisualFrame[playerIndex], p);
+        } else {
+            drawStickFigure(window, p, playerIndex);
+        }
+    } else if (std::abs(p.velocity.x) > 20.f) {
+        if (runTextureLoaded) {
+            drawAnimatedSprite(window, runTexture, runFrame, p);
+        } else {
+            drawStickFigure(window, p, playerIndex);
+        }
+    } else {
+        if (idleTextureLoaded) {
+            drawAnimatedSprite(window, idleTexture, idleFrame, p);
+        } else {
+            drawStickFigure(window, p, playerIndex);
+        }
+    }
+
+    drawCallsThisFrame++;
+    if (drawCallsThisFrame >= MAX_PLAYERS) {
+        drawCallsThisFrame = 0;
     }
 }
 
@@ -96,4 +195,20 @@ void drawBackground(RenderWindow& window) {
     RectangleShape bg(Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT));
     bg.setFillColor(Color(30, 30, 30));
     window.draw(bg);
+}
+
+
+void drawLevel(sf::RenderWindow& window, const Level& level) {
+    for (int i = 0; i < level.platformCount; i++) {
+        sf::RectangleShape rect(sf::Vector2f(
+            level.platforms[i].size.x,
+            level.platforms[i].size.y
+        ));
+        rect.setPosition(sf::Vector2f(
+            level.platforms[i].position.x,
+            level.platforms[i].position.y
+        ));
+        rect.setFillColor(level.platforms[i].color);
+        window.draw(rect);
+    }
 }
