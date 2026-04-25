@@ -4,8 +4,8 @@
 #include "gameglobale.h"
 #include <SFML/Graphics.hpp>
 
-void playerInit(Player& p, int index);
-void playerReadInputForIndex(Player& p, int index);
-void playerUpdate(Player& p, float dt);
+void playerInit(Player& player, int index, const Level& level);
+void playerReadInputForIndex(Player& player, int index);
+void playerUpdate(Player& player, float dt);
 
 #endif

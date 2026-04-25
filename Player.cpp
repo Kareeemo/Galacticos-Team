@@ -1,4 +1,5 @@
 #include "gameglobale.h"
+#include "Level.h"
 #include <SFML/Graphics.hpp>
 
 using namespace sf;
@@ -10,8 +11,8 @@ constexpr float ATTACK_BOX_WIDTH = 40.f;
 constexpr float ATTACK_BOX_HEIGHT = 20.f;
 }
 
-void playerInit(Player& player, int index) {
-    player.pos = {200.f + index * 300.f, 300.f};
+void playerInit(Player& player, int index, const Level& level) {
+    player.pos = getSpawnPoint(level, index);
     player.velocity = {0.f, 0.f};
     player.width = 30.f;
     player.height = 60.f;

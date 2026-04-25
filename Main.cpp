@@ -10,9 +10,10 @@ int score = 0;
 std::vector<Level> levels;
 
 int main() {
+    Level currentLevel;
     Player players[2];
-    playerInit(players[0], 0);
-    playerInit(players[1], 1);
+    playerInit(players[0], 0, currentLevel);
+    playerInit(players[1], 1, currentLevel);
 
     sf::RenderWindow window(
         sf::VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}),
@@ -42,7 +43,6 @@ int main() {
         window.clear(sf::Color::Black);
         drawBackground(window);
 
-        Level currentLevel;
         loadLevel(currentLevel, 1);
         drawLevel(window, currentLevel);
 
