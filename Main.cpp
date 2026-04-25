@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "Physics.h"
+#include "Level.h"
 #include "Render.h"
 #include "Player.h"
 #include "UI.h"
@@ -40,6 +41,10 @@ int main() {
 
         window.clear(sf::Color::Black);
         drawBackground(window);
+
+        Level currentLevel;
+        loadLevel(currentLevel, 1);
+        drawLevel(window, currentLevel);
 
         for (int i = 0; i < 2; i++) {
             drawPlayer(window, players[i], i, dt);
