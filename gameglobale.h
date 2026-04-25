@@ -32,6 +32,8 @@ using namespace sf;
     int platformCount;
     sf::Color bgColor;
     Vec2 spawnPoints[4];
+    float width;
+    float height;
    };
 
     extern std::vector<Level> levels;

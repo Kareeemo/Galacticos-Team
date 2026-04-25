@@ -11,8 +11,8 @@ static void addPlatform(Level& level, float x, float y, float width, float heigh
 
 void loadLevel(Level& level, int levelId) {
     level.platformCount = 0;
-    // level.width  = 1280.f;
-    // level.height = 720.f;
+    level.width  = 1280.f;
+    level.height = 720.f;
 
     sf::Color ground = sf::Color(80,  80,  90);
     sf::Color mid    = sf::Color(100, 110, 130);

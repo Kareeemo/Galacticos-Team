@@ -1,5 +1,6 @@
 #include "Render.h"
 #include <cmath>
+#include "Level.h"
 
 using namespace sf;
 
@@ -194,4 +195,20 @@ void drawBackground(RenderWindow& window) {
     RectangleShape bg(Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT));
     bg.setFillColor(Color(30, 30, 30));
     window.draw(bg);
+}
+
+
+void drawLevel(sf::RenderWindow& window, const Level& level) {
+    for (int i = 0; i < level.platformCount; i++) {
+        sf::RectangleShape rect(sf::Vector2f(
+            level.platforms[i].size.x,
+            level.platforms[i].size.y
+        ));
+        rect.setPosition(sf::Vector2f(
+            level.platforms[i].position.x,
+            level.platforms[i].position.y
+        ));
+        rect.setFillColor(level.platforms[i].color);
+        window.draw(rect);
+    }
 }
