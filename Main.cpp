@@ -2,6 +2,7 @@
 #include "Physics.h"
 #include "Render.h"
 #include "Player.h"
+#include "UI.h"
 #include "gameglobale.h"
 
 int score = 0;

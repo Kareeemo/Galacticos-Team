@@ -18,3 +18,7 @@ bin/
 
 # Windows binaries and build artifacts
 *.a
+
+
+# Makefile
+Makefile
