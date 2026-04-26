@@ -4,7 +4,7 @@
 using namespace sf;
 
 namespace {
-const float GRAVITY     = 1200.f;
+const float GRAVITY     = 900.f;
 const float KNOCKBACK_X = 400.f;
 const float KNOCKBACK_Y = -250.f;
 const int   ATTACK_DMG  = 10;

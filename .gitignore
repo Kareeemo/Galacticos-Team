@@ -1,5 +1,6 @@
 # VS Code
 .vscode/
+.idea/
 
 # C++
 *.exe
@@ -9,6 +10,10 @@
 # Build folders
 build/
 bin/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+compile_commands.json
 
 # SFML DLLs
 *.dll
@@ -18,7 +23,3 @@ bin/
 
 # Windows binaries and build artifacts
 *.a
-
-
-# Makefile
-Makefile
