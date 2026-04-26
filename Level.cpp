@@ -1,7 +1,7 @@
 #include "gameglobale.h"
 #include "Level.h"
 
-static void addPlatform(Level& level, float x, float y, float width, float height, sf::Color color) {
+static void addPlatform(Level& level, float x, float y, float width, float height, sf::Color color) {    
     int i = level.platformCount;
     level.platforms[i].position = {x, y};
     level.platforms[i].size     = {width, height};
@@ -11,22 +11,26 @@ static void addPlatform(Level& level, float x, float y, float width, float heigh
 
 void loadLevel(Level& level, int levelId) {
     level.platformCount = 0;
-    level.width  = 1280.f;
-    level.height = 720.f;
+    level.size  = {1920.f,1080.f};
 
-    sf::Color ground = sf::Color(80,  80,  90);
+    sf::Color groundColor = sf::Color(80,  80,  90);
     sf::Color mid    = sf::Color(100, 110, 130);
 
     if (levelId == 1) {
-        addPlatform(level, 0,    300, 1920, 40, ground); // floor
+        addPlatform(level, 0,    300, 1920, 40, groundColor); // floor
         addPlatform(level, 490,  400, 300, 20,  mid);    // center
         addPlatform(level, 150,  520, 200, 20,  mid);    // left mid
         addPlatform(level, 930,  520, 200, 20,  mid);    // right mid
         addPlatform(level, 200,  280, 160, 20,  mid);    // high left
         addPlatform(level, 920,  280, 160, 20,  mid);    // high right
 
-        level.spawnPoints[0] = {300.f, 200.f};
-        level.spawnPoints[1] = {1000.f, 200.f};
+        // Set Spawn points for each player
+
+        int arrLenghth = MAX_PLAYERS - 1;
+
+        for(int i = 0; i <= arrLenghth; i++){
+            level.spawnPoints[i] = {200.f + i * 300.f, 300.f};
+        }
 
     }
 }
