@@ -17,23 +17,23 @@ using namespace sf;
 
   //  Level
    struct Platform{
-    sf::FloatRect rect;
-    bool solid;
-    Vec2 position;
-    Vec2 size;
-    sf::Color color;
-   };
-
-   const int MAX_PLATFORMS = 64;
-   const int MAX_PLAYERS = 2;
-
-   struct Level{
-    Platform platforms[MAX_PLATFORMS];
-    int platformCount;
-    sf::Color bgColor;
-    Vec2 spawnPoints[4];
-    float width;
-    float height;
+     bool solid;
+     Vec2 position;
+     Vec2 size;
+     sf::Color color;
+     sf::FloatRect rect;
+    };
+    
+    const int MAX_PLATFORMS = 64;
+    const int MAX_PLAYERS = 2;
+    const int MAX_LEVELS = 2;
+    
+    struct Level{
+      Platform platforms[MAX_PLATFORMS];
+      int platformCount;
+      sf::Color bgColor;
+      Vec2 spawnPoints[MAX_PLAYERS];
+      Vec2 size;
    };
 
     extern std::vector<Level> levels;
