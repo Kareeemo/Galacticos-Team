@@ -1,6 +1,7 @@
 #include "Render.h"
 #include <cmath>
 #include "Level.h"
+#include <SFML/Audio.hpp>
 
 using namespace sf;
 
@@ -119,10 +120,14 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
     }
 
     if (p.isAttacking) {
-        attackVisualActive[playerIndex] = true;
-        attackVisualFrame[playerIndex] = 0;
-        attackVisualTimer[playerIndex] = 0.f;
-    }
+    attackVisualActive[playerIndex] = true;
+    attackVisualFrame[playerIndex] = 0;
+    attackVisualTimer[playerIndex] = 0.f;
+    static SoundBuffer hitBuffer;
+    static Sound hitSound;
+    static bool hitLoaded = hitBuffer.loadFromFile("assets/hit 1.wav");
+    if (hitLoaded) hitSound.play();
+}
 
     if (attackVisualActive[playerIndex]) {
         const float attackFrameDuration = 0.05f;
@@ -177,7 +182,7 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
 
 void drawBackground(RenderWindow& window) {
     static Texture backgroundTexture;
-    static bool textureLoaded = backgroundTexture.loadFromFile("assets/hero.png");
+   static bool textureLoaded = backgroundTexture.loadFromFile("assets/background.png.png");
 
     if (textureLoaded) {
         Sprite background(backgroundTexture);
@@ -196,7 +201,20 @@ void drawBackground(RenderWindow& window) {
     bg.setFillColor(Color(30, 30, 30));
     window.draw(bg);
 }
-
+void drawLevel(RenderWindow& window, Level& level) {
+    for (int i = 0; i < level.platformCount; i++) {
+        RectangleShape platform(Vector2f(
+            level.platforms[i].size.x,
+            level.platforms[i].size.y
+        ));
+        platform.setPosition(Vector2f(
+            level.platforms[i].position.x,
+            level.platforms[i].position.y
+        ));
+        platform.setFillColor(level.platforms[i].color);
+        window.draw(platform);
+    }
+}
 
 void drawLevel(sf::RenderWindow& window, const Level& level) {
     for (int i = 0; i < level.platformCount; i++) {
