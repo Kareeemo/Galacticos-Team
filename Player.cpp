@@ -6,7 +6,7 @@ using namespace sf;
 
 namespace {
 constexpr float SPEED = 250.f;
-constexpr float JUMP_VELOCITY = -550.f;
+constexpr float JUMP_VELOCITY = -650.f;
 constexpr float ATTACK_BOX_WIDTH = 100.f;
 constexpr float ATTACK_BOX_HEIGHT = 80.f;
 }
