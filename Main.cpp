@@ -29,8 +29,6 @@ int main() {
     playerInit(players[0], 0, currentLevel);
     playerInit(players[1], 1, currentLevel);
 
-    players[0].pos.x = 300.f;
-    players[1].pos.x = 1300.f;
 
     sf::Clock clock;
 

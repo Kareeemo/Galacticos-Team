@@ -17,17 +17,16 @@ void loadLevel(Level& level, int levelId) {
     sf::Color mid    = sf::Color(100, 110, 130);
 
     if (levelId == 0) {
-        addPlatform(level, 0,    0, 1920, 40, groundColor); // floor
-        addPlatform(level, 490,  400, 300, 20,  mid);    // center
+        // addPlatform(level, 0,    0, 1920, 40, groundColor); // floor
+        addPlatform(level, 490,  550, 300, 20,  mid);    // center
         addPlatform(level, 150,  520, 200, 20,  mid);    // left mid
-        addPlatform(level, 930,  520, 200, 20,  mid);    // right mid
-        addPlatform(level, 200,  280, 160, 20,  mid);    // high left
-        addPlatform(level, 920,  280, 160, 20,  mid);    // high right
+        addPlatform(level, 930,  650, 200, 20,  mid);    // right mid
+
 
         // Set Spawn points for each player
 
         for(int i = 0; i < MAX_PLAYERS; i++){
-            level.spawnPoints[i] = {200.f + i * 300.f, 300.f};
+            level.spawnPoints[i] = {200.f + i * 1000.f, 300.f};
         }
 
     }
