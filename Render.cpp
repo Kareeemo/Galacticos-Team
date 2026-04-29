@@ -124,7 +124,7 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
     attackVisualFrame[playerIndex] = 0;
     attackVisualTimer[playerIndex] = 0.f;
     static SoundBuffer hitBuffer;
-    static Sound hitSound;
+    static Sound hitSound(hitBuffer);
     static bool hitLoaded = hitBuffer.loadFromFile("assets/hit 1.wav");
     if (hitLoaded) hitSound.play();
 }
@@ -182,7 +182,7 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
 
 void drawBackground(RenderWindow& window) {
     static Texture backgroundTexture;
-   static bool textureLoaded = backgroundTexture.loadFromFile("assets/background.png.png");
+  static bool textureLoaded = backgroundTexture.loadFromFile("assets/hero.png");
 
     if (textureLoaded) {
         Sprite background(backgroundTexture);
@@ -217,6 +217,8 @@ void drawLevel(RenderWindow& window, Level& level) {
 }
 
 void drawLevel(sf::RenderWindow& window, const Level& level) {
+    static sf::Texture platformTexture;
+static bool texLoaded = platformTexture.loadFromFile("assets/platform.png");
     for (int i = 0; i < level.platformCount; i++) {
         sf::RectangleShape rect(sf::Vector2f(
             level.platforms[i].size.x,
@@ -226,7 +228,14 @@ void drawLevel(sf::RenderWindow& window, const Level& level) {
             level.platforms[i].position.x,
             level.platforms[i].position.y
         ));
-        rect.setFillColor(level.platforms[i].color);
-        window.draw(rect);
+       if (texLoaded) {
+    sf::Sprite platformSprite(platformTexture);
+    platformSprite.setPosition(sf::Vector2f(level.platforms[i].position.x, level.platforms[i].position.y));
+    platformSprite.setScale(sf::Vector2f(level.platforms[i].size.x / platformTexture.getSize().x, level.platforms[i].size.y / platformTexture.getSize().y));
+    window.draw(platformSprite);
+} else {
+    rect.setFillColor(level.platforms[i].color);
+    window.draw(rect);
+}
     }
 }
