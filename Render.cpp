@@ -124,7 +124,7 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
     attackVisualFrame[playerIndex] = 0;
     attackVisualTimer[playerIndex] = 0.f;
     static SoundBuffer hitBuffer;
-    static Sound hitSound;
+    static Sound hitSound(hitBuffer);
     static bool hitLoaded = hitBuffer.loadFromFile("assets/hit 1.wav");
     if (hitLoaded) hitSound.play();
 }
@@ -182,7 +182,7 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
 
 void drawBackground(RenderWindow& window) {
     static Texture backgroundTexture;
-   static bool textureLoaded = backgroundTexture.loadFromFile("assets/background.png.png");
+  static bool textureLoaded = backgroundTexture.loadFromFile("assets/hero.png");
 
     if (textureLoaded) {
         Sprite background(backgroundTexture);

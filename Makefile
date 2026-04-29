@@ -2,7 +2,7 @@ SFML_PATH = C:/msys64/mingw64
 CXX = g++
 
 CXXFLAGS = -I$(SFML_PATH)/include -std=c++17 -O3
-LDFLAGS = -L$(SFML_PATH)/lib -lsfml-graphics -lsfml-window -lsfml-system -lopengl32 -lfreetype -lwinmm -lgdi32 -mwindows
+LDFLAGS = -L$(SFML_PATH)/lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lopengl32 -lfreetype
 
 OBJECTS = Main.o Player.o Level.o Physics.o Render.o Ui.o
 TARGET = Main.exe
