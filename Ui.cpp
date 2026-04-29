@@ -1,197 +1,152 @@
-#include "UI.h"
+#include "Ui.h"
 #include "gameglobale.h"
 #include <string>
 
-const sf::Color PLAYER_COLORS[2] = {
-    sf::Color(80,  160, 255),
-    sf::Color(255, 90,  90 )
-};
-
-const float BAR_WIDTH  = 200.f;
-const float BAR_HEIGHT = 22.f;
-const float BAR_Y      = 20.f;
+const sf::Color PLAYER_COLORS[2] = { sf::Color(80, 160, 255), sf::Color(255, 90, 90) };
+const float BAR_WIDTH  = 220.f;
+const float BAR_HEIGHT = 18.f;
+const float BAR_Y      = 30.f;
 
 static sf::Font g_font;
 static bool     g_fontLoaded = false;
 
-static void loadFont()
-{
+static void loadFont() {
     if (g_fontLoaded) return;
-    if      (g_font.openFromFile("assets/arial.ttf")) g_fontLoaded = true;
-    else if (g_font.openFromFile("arial.ttf"))        g_fontLoaded = true;
+    g_fontLoaded = g_font.openFromFile("assets/ArialNarrow7-9YJ9n.ttf") || g_font.openFromFile("assets/arial.ttf");
 }
 
-static float getBarX(int index)
-{
-    return (index == 0) ? 40.f : (1600.f - BAR_WIDTH - 40.f);
-}
-
-static void drawSingleHealthBar(sf::RenderWindow& window, int index, int hp, int maxHp)
-{
-    float xPos = getBarX(index);
-
-    sf::RectangleShape bgBar({BAR_WIDTH, BAR_HEIGHT});
-    bgBar.setPosition({xPos, BAR_Y});
-    bgBar.setFillColor(sf::Color(30, 30, 30));
-    bgBar.setOutlineColor(sf::Color(100, 100, 100));
-    bgBar.setOutlineThickness(1.5f);
-    window.draw(bgBar);
-
-    float ratio = (maxHp > 0) ? ((float)hp / maxHp) : 0.f;
-    if (ratio < 0.f) ratio = 0.f;
-    if (ratio > 1.f) ratio = 1.f;
-
-    sf::Color barColor;
-    if      (ratio > 0.60f) barColor = sf::Color(50,  200, 50);
-    else if (ratio > 0.30f) barColor = sf::Color(230, 160, 20);
-    else                    barColor = sf::Color(200, 40,  40);
-
-    if (ratio > 0.f)
-    {
-        sf::RectangleShape fgBar({BAR_WIDTH * ratio, BAR_HEIGHT});
-        fgBar.setPosition({xPos, BAR_Y});
-        fgBar.setFillColor(barColor);
-        window.draw(fgBar);
-    }
-
-    sf::RectangleShape border({BAR_WIDTH, BAR_HEIGHT});
-    border.setPosition({xPos, BAR_Y});
-    border.setFillColor(sf::Color::Transparent);
-    border.setOutlineColor(sf::Color(200, 200, 200));
-    border.setOutlineThickness(1.5f);
-    window.draw(border);
-
-    loadFont();
-    if (g_fontLoaded)
-    {
-        std::string labels[2] = {"P1", "P2"};
-
-        sf::Text nameText(g_font);
-        nameText.setString(labels[index]);
-        nameText.setCharacterSize(14);
-        nameText.setFillColor(PLAYER_COLORS[index]);
-        nameText.setStyle(sf::Text::Bold);
-        nameText.setPosition({xPos, BAR_Y - 20.f});
-        window.draw(nameText);
-
-        int hpVal = (hp < 0) ? 0 : hp;
-        sf::Text hpText(g_font);
-        hpText.setString(std::to_string(hpVal));
-        hpText.setCharacterSize(12);
-        hpText.setFillColor(sf::Color::White);
-        auto tb = hpText.getLocalBounds();
-        hpText.setOrigin({tb.size.x / 2.f, tb.size.y / 2.f});
-        hpText.setPosition({xPos + BAR_WIDTH / 2.f, BAR_Y + BAR_HEIGHT / 2.f - 2.f});
-        window.draw(hpText);
+static void drawWinDots(sf::RenderWindow& window, float xPos, int wins, int playerIndex) {
+    for (int w = 0; w < wins; w++) {
+        sf::CircleShape dot(8.f);
+        dot.setFillColor(sf::Color::Yellow);
+        dot.setOutlineColor(sf::Color(200, 180, 0));
+        dot.setOutlineThickness(1.5f);
+        float dotX = (playerIndex == 0) ? (xPos + BAR_WIDTH + 15.f + w * 22.f) : (xPos - 15.f - (w + 1) * 22.f);
+        dot.setPosition({dotX, BAR_Y - 1.f});
+        window.draw(dot);
     }
 }
 
-void drawHealthBars(sf::RenderWindow& window, Player players[])
-{
-    for (int i = 0; i < MAX_PLAYERS; i++)
-    {
-        int displayHp = players[i].isAlive ? players[i].health : 0;
-        drawSingleHealthBar(window, i, displayHp, players[i].maxHealth);
+void drawHealthBars(sf::RenderWindow& window, Player players[], int p1Wins, int p2Wins) {
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        float xPos = (i == 0) ? 50.f : (1600.f - BAR_WIDTH - 50.f);
+        int hp = players[i].isAlive ? players[i].health : 0;
+        sf::RectangleShape bgBar({BAR_WIDTH, BAR_HEIGHT});
+        bgBar.setPosition({xPos, BAR_Y});
+        bgBar.setFillColor(sf::Color(30, 30, 30));
+        bgBar.setOutlineThickness(2.5f);
+        bgBar.setOutlineColor(sf::Color(70, 70, 70));
+        window.draw(bgBar);
 
-        if (!players[i].isAlive)
-        {
-            loadFont();
-            if (g_fontLoaded)
-            {
-                sf::Text deadText(g_font);
-                deadText.setString("DEAD");
-                deadText.setCharacterSize(12);
-                deadText.setFillColor(sf::Color(180, 50, 50));
-                deadText.setStyle(sf::Text::Bold);
-                auto db = deadText.getLocalBounds();
-                deadText.setOrigin({db.size.x / 2.f, db.size.y / 2.f});
-                deadText.setPosition({getBarX(i) + BAR_WIDTH / 2.f, BAR_Y + BAR_HEIGHT / 2.f - 2.f});
-                window.draw(deadText);
-            }
+        float ratio = (float)hp / players[i].maxHealth;
+        if (ratio > 0.f) {
+            sf::RectangleShape fgBar({BAR_WIDTH * (ratio > 1.f ? 1.f : ratio), BAR_HEIGHT});
+            fgBar.setPosition({xPos, BAR_Y});
+            fgBar.setFillColor(ratio > 0.6f ? sf::Color(34, 139, 34) : (ratio > 0.3f ? sf::Color(184, 134, 11) : sf::Color(139, 0, 0)));
+            window.draw(fgBar);
         }
+
+        loadFont();
+        if (g_fontLoaded) {
+            sf::Text nameText(g_font, i == 0 ? "PLAYER 1" : "PLAYER 2", 15);
+            nameText.setFillColor(PLAYER_COLORS[i]);
+            nameText.setStyle(sf::Text::Bold);
+            nameText.setPosition({xPos, BAR_Y - 25.f});
+            window.draw(nameText);
+        }
+        drawWinDots(window, xPos, (i == 0 ? p1Wins : p2Wins), i);
     }
 }
 
-void drawWinScreen(sf::RenderWindow& window, int winnerIndex)
-{
+void drawRoundWinner(sf::RenderWindow& window, int winnerIndex) {
     sf::RectangleShape overlay({1600.f, 900.f});
-    overlay.setFillColor(sf::Color(0, 0, 0, 170));
+    overlay.setFillColor(sf::Color(0, 0, 0, 120));
     window.draw(overlay);
-
     loadFont();
     if (!g_fontLoaded) return;
-
-    std::string msgs[2] = {"Player 1 Wins!", "Player 2 Wins!"};
-
-    sf::Text winText(g_font);
-    winText.setString(msgs[winnerIndex]);
-    winText.setCharacterSize(72);
-    winText.setFillColor(PLAYER_COLORS[winnerIndex]);
+    std::string msg = (winnerIndex == 0) ? "PLAYER 1 WINS ROUND!" : "PLAYER 2 WINS ROUND!";
+    sf::Text winText(g_font, msg, 70);
+    winText.setFillColor(sf::Color::White); // أبيض حسب طلبك
     winText.setStyle(sf::Text::Bold);
-    auto wb = winText.getLocalBounds();
-    winText.setOrigin({wb.size.x / 2.f, wb.size.y / 2.f});
-    winText.setPosition({800.f, 420.f});
+    winText.setOrigin({winText.getLocalBounds().size.x / 2.f, 0});
+    winText.setPosition({800.f, 380.f});
+    window.draw(winText);
+}
+
+void drawWinScreen(sf::RenderWindow& window, int winnerIndex, int p1Wins, int p2Wins) {
+    sf::RectangleShape overlay({1600.f, 900.f});
+    overlay.setFillColor(sf::Color(0, 0, 0, 220));
+    window.draw(overlay);
+    loadFont();
+    sf::Text header(g_font, "MATCH OVER", 50);
+    header.setFillColor(sf::Color::Yellow);
+    header.setOrigin({header.getLocalBounds().size.x / 2.f, 0});
+    header.setPosition({800.f, 250.f});
+    window.draw(header);
+
+    std::string msg = (winnerIndex == 0) ? "PLAYER 1 WINS!" : "PLAYER 2 WINS!";
+    sf::Text winText(g_font, msg, 80);
+    winText.setFillColor(sf::Color::White);
+    winText.setStyle(sf::Text::Bold);
+    winText.setOrigin({winText.getLocalBounds().size.x / 2.f, 0});
+    winText.setPosition({800.f, 330.f});
     window.draw(winText);
 
-    sf::Text subText(g_font);
-    subText.setString("Press R to Restart");
-    subText.setCharacterSize(26);
+    sf::Text subText(g_font, "PRESS R FOR MAIN MENU", 28);
     subText.setFillColor(sf::Color(200, 200, 200));
-    auto sb = subText.getLocalBounds();
-    subText.setOrigin({sb.size.x / 2.f, sb.size.y / 2.f});
-    subText.setPosition({800.f, 520.f});
+    subText.setOrigin({subText.getLocalBounds().size.x / 2.f, 0});
+    subText.setPosition({800.f, 570.f});
     window.draw(subText);
 }
 
-void drawPauseScreen(sf::RenderWindow& window)
-{
-    sf::RectangleShape overlay({1600.f, 900.f});
-    overlay.setFillColor(sf::Color(0, 0, 0, 130));
-    window.draw(overlay);
-
+// (دوال drawMainMenu, drawPauseScreen, drawCountdown, drawRoundNumber تبقى كما هي في الكود السابق)
+void drawMainMenu(sf::RenderWindow& window, int selectedItem) {
+    sf::RectangleShape bg({1600.f, 900.f});
+    bg.setFillColor(sf::Color::Black);
+    window.draw(bg);
+    static sf::Texture logoTexture;
+    static bool logoLoaded = logoTexture.loadFromFile("assets/logo.png");
+    if (logoLoaded) {
+        sf::Sprite logo(logoTexture);
+        auto size = logoTexture.getSize();
+        logo.setOrigin({size.x / 2.f, size.y / 2.f});
+        logo.setPosition({800.f, 350.f});
+        logo.setScale({700.f/size.x, 700.f/size.x});
+        window.draw(logo);
+    }
     loadFont();
-    if (!g_fontLoaded) return;
-
-    sf::Text pauseText(g_font);
-    pauseText.setString("PAUSED");
-    pauseText.setCharacterSize(80);
-    pauseText.setFillColor(sf::Color::White);
-    pauseText.setStyle(sf::Text::Bold);
-    auto pb = pauseText.getLocalBounds();
-    pauseText.setOrigin({pb.size.x / 2.f, pb.size.y / 2.f});
-    pauseText.setPosition({800.f, 420.f});
-    window.draw(pauseText);
-
-    sf::Text resumeText(g_font);
-    resumeText.setString("Press ESC to Resume");
-    resumeText.setCharacterSize(24);
-    resumeText.setFillColor(sf::Color(180, 180, 180));
-    auto rb = resumeText.getLocalBounds();
-    resumeText.setOrigin({rb.size.x / 2.f, rb.size.y / 2.f});
-    resumeText.setPosition({800.f, 520.f});
-    window.draw(resumeText);
+    sf::Text t1(g_font, "PLAY", 50); t1.setFillColor(selectedItem == 0 ? sf::Color::Yellow : sf::Color::White);
+    t1.setOrigin({t1.getLocalBounds().size.x/2.f, 0}); t1.setPosition({800.f, 650.f}); window.draw(t1);
+    sf::Text t2(g_font, "QUIT", 50); t2.setFillColor(selectedItem == 1 ? sf::Color::Yellow : sf::Color::White);
+    t2.setOrigin({t2.getLocalBounds().size.x/2.f, 0}); t2.setPosition({800.f, 750.f}); window.draw(t2);
 }
 
-void drawCountdown(sf::RenderWindow& window, int count)
-{
+void drawPauseScreen(sf::RenderWindow& window, int pauseSelection) {
+    sf::RectangleShape overlay({1600.f, 900.f});
+    overlay.setFillColor(sf::Color(0, 0, 0, 150));
+    window.draw(overlay);
     loadFont();
-    if (!g_fontLoaded) return;
+    sf::Text t(g_font, "PAUSED", 80); t.setOrigin({t.getLocalBounds().size.x/2.f, 0}); t.setPosition({800.f, 250.f}); window.draw(t);
+    sf::Text r(g_font, "RESUME", 40); r.setFillColor(pauseSelection == 0 ? sf::Color::Yellow : sf::Color::White);
+    r.setOrigin({r.getLocalBounds().size.x/2.f, 0}); r.setPosition({800.f, 450.f}); window.draw(r);
+    sf::Text m(g_font, "QUIT TO MENU", 40); m.setFillColor(pauseSelection == 1 ? sf::Color::Yellow : sf::Color::White);
+    m.setOrigin({m.getLocalBounds().size.x/2.f, 0}); m.setPosition({800.f, 550.f}); window.draw(m);
+}
 
-    std::string txt;
-    sf::Color   col;
+void drawCountdown(sf::RenderWindow& window, int count) {
+    loadFont();
+    std::string txt = (count == 3) ? "3" : (count == 2) ? "2" : (count == 1) ? "1" : "FIGHT!";
+    sf::Text t(g_font, txt, (count == 0) ? 90 : 120);
+    t.setFillColor((count == 0) ? sf::Color::Red : sf::Color::White);
+    t.setOrigin({t.getLocalBounds().size.x/2.f, t.getLocalBounds().size.y/2.f});
+    t.setPosition({800.f, 400.f});
+    window.draw(t);
+}
 
-    if      (count == 3) { txt = "3";      col = sf::Color(255, 80,  80); }
-    else if (count == 2) { txt = "2";      col = sf::Color(255, 180, 50); }
-    else if (count == 1) { txt = "1";      col = sf::Color(80,  220, 80); }
-    else                 { txt = "FIGHT!"; col = sf::Color(255, 255, 80); }
-
-    sf::Text cdText(g_font);
-    cdText.setString(txt);
-    cdText.setCharacterSize((count == 0) ? 90 : 120);
-    cdText.setFillColor(col);
-    cdText.setStyle(sf::Text::Bold);
-    auto cb = cdText.getLocalBounds();
-    cdText.setOrigin({cb.size.x / 2.f, cb.size.y / 2.f});
-    cdText.setPosition({800.f, 400.f});
-    window.draw(cdText);
+void drawRoundNumber(sf::RenderWindow& window, int round) {
+    loadFont();
+    sf::Text t(g_font, "ROUND " + std::to_string(round), 100);
+    t.setOrigin({t.getLocalBounds().size.x/2.f, t.getLocalBounds().size.y/2.f});
+    t.setPosition({800.f, 400.f});
+    window.draw(t);
 }

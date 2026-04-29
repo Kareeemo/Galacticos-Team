@@ -6,105 +6,100 @@
 #include "Player.h"
 #include "Physics.h"
 #include "Render.h"
-#include "UI.h"
+#include "Ui.h"
 
 int score = 0;
 std::vector<Level> levels;
-
-enum GameState { COUNTDOWN, PLAYING, PAUSED, GAME_OVER };
+enum GameState { MENU, ROUND_START, COUNTDOWN, PLAYING, GAME_OVER, PAUSED };
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode({(unsigned int)WINDOW_WIDTH, (unsigned int)WINDOW_HEIGHT}), "Stick Fight - Galacticos");
+    sf::RenderWindow window(sf::VideoMode({(unsigned int)WINDOW_WIDTH, (unsigned int)WINDOW_HEIGHT}), "STICK FIGHT");
     window.setFramerateLimit(60);
 
-    GameState currentState = COUNTDOWN;
-    float countdownTimer = 3.9f; 
-    int winnerIndex = -1;
+    GameState currentState = MENU;
+    float countdownTimer = 3.9f, roundTimer = 2.0f;
+    int currentRound = 1, winnerIndex = -1, menuSelection = 0, pauseSelection = 0, p1Wins = 0, p2Wins = 0;
 
     Level currentLevel;
-    int currentLevelId = 0;
-    loadLevel(currentLevel, currentLevelId);
-
+    loadLevel(currentLevel, 0);
     Player players[MAX_PLAYERS];
-    playerInit(players[0], 0, currentLevel);
-    playerInit(players[1], 1, currentLevel);
-
-
+    playerInit(players[0], 0, currentLevel); playerInit(players[1], 1, currentLevel);
     sf::Clock clock;
 
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds();
-
         while (std::optional<sf::Event> event = window.pollEvent()) {
-            if (event->is<sf::Event::Closed>()) {
-                window.close();
-            }
+            if (event->is<sf::Event::Closed>()) window.close();
             if (auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-                if (keyPressed->code == sf::Keyboard::Key::Escape && currentState == PLAYING) {
-                    currentState = PAUSED;
-                } else if (keyPressed->code == sf::Keyboard::Key::Escape && currentState == PAUSED) {
-                    currentState = PLAYING;
-                }
-                if (keyPressed->code == sf::Keyboard::Key::R && currentState == GAME_OVER) {
-                    playerInit(players[0], 0, currentLevel);
-                    playerInit(players[1], 1, currentLevel);
-                    players[0].pos.x = 300.f;
-                    players[1].pos.x = 1300.f;
-                    countdownTimer = 3.9f;
-                    currentState = COUNTDOWN;
+                if (currentState == MENU) {
+                    if (keyPressed->code == sf::Keyboard::Key::Up) menuSelection = 0;
+                    if (keyPressed->code == sf::Keyboard::Key::Down) menuSelection = 1;
+                    if (keyPressed->code == sf::Keyboard::Key::Enter) {
+                        if (menuSelection == 0) {
+                            currentRound = 1; p1Wins = 0; p2Wins = 0;
+                            playerInit(players[0], 0, currentLevel); playerInit(players[1], 1, currentLevel);
+                            players[0].pos.x = 300.f; players[1].pos.x = 1300.f;
+                            currentState = ROUND_START;
+                        } else window.close();
+                    }
+                } else if (currentState == PAUSED) {
+                    if (keyPressed->code == sf::Keyboard::Key::Up) pauseSelection = 0;
+                    if (keyPressed->code == sf::Keyboard::Key::Down) pauseSelection = 1;
+                    if (keyPressed->code == sf::Keyboard::Key::Enter) {
+                        if (pauseSelection == 0) currentState = PLAYING;
+                        else currentState = MENU;
+                    }
+                } else if (keyPressed->code == sf::Keyboard::Key::Escape && (currentState == PLAYING || currentState == ROUND_START)) {
+                    currentState = PAUSED; pauseSelection = 0;
+                } else if (keyPressed->code == sf::Keyboard::Key::R && currentState == GAME_OVER) {
+                    currentState = MENU;
                 }
             }
         }
 
-        if (currentState == COUNTDOWN) {
-            countdownTimer -= dt;
-            if (countdownTimer <= 0.f) currentState = PLAYING;
-        } 
-        else if (currentState == PLAYING) {
-            playerReadInputForIndex(players[0], 0);
-            playerReadInputForIndex(players[1], 1);
-
-            playerUpdate(players[0], dt);
-            playerUpdate(players[1], dt);
-
-            physicsUpdate(players[0], dt);
-            physicsUpdate(players[1], dt);
-
+        if (currentState == ROUND_START) {
+            roundTimer -= dt; if (roundTimer <= 0.f) { roundTimer = 2.0f; countdownTimer = 3.9f; currentState = COUNTDOWN; }
+        } else if (currentState == COUNTDOWN) {
+            countdownTimer -= dt; if (countdownTimer <= 0.f) currentState = PLAYING;
+        } else if (currentState == PLAYING) {
+            playerReadInputForIndex(players[0], 0); playerReadInputForIndex(players[1], 1);
+            playerUpdate(players[0], dt); playerUpdate(players[1], dt);
+            physicsUpdate(players[0], dt); physicsUpdate(players[1], dt);
             resolvePlayerCollision(players[0], players[1]);
-            handleCombat(players[0], players[1]);
-            handleCombat(players[1], players[0]);
+            handleCombat(players[0], players[1]); handleCombat(players[1], players[0]);
 
-            if (!players[0].isAlive) { 
-                winnerIndex = 1; 
-                currentState = GAME_OVER; 
-            }
-            else if (!players[1].isAlive) { 
-                winnerIndex = 0; 
-                currentState = GAME_OVER; 
+            if (!players[0].isAlive || !players[1].isAlive) {
+                winnerIndex = !players[0].isAlive ? 1 : 0;
+                if (winnerIndex == 0) p1Wins++; else p2Wins++;
+                
+                if (p1Wins == 2 || p2Wins == 2) {
+                    currentState = GAME_OVER;
+                } else {
+                    // الانتقال الفوري للراوند التالي
+                    currentRound++;
+                    playerInit(players[0], 0, currentLevel); 
+                    playerInit(players[1], 1, currentLevel);
+                    players[0].pos.x = 300.f; 
+                    players[1].pos.x = 1300.f;
+                    roundTimer = 2.0f; 
+                    currentState = ROUND_START;
+                }
             }
         }
 
         window.clear(sf::Color::Black);
-        
-        drawBackground(window);
-        drawLevel(window, currentLevel);
-        drawPlayer(window, players[0], 0, dt);
-        drawPlayer(window, players[1], 1, dt);
-
-        window.setView(window.getDefaultView());
-
-        drawHealthBars(window, players);
-
-        if (currentState == COUNTDOWN) {
-            drawCountdown(window, (int)countdownTimer);
-        } else if (currentState == PAUSED) {
-            drawPauseScreen(window);
-        } else if (currentState == GAME_OVER) {
-            drawWinScreen(window, winnerIndex);
+        if (currentState == MENU) drawMainMenu(window, menuSelection);
+        else {
+            drawBackground(window); drawLevel(window, currentLevel);
+            drawPlayer(window, players[0], 0, dt); drawPlayer(window, players[1], 1, dt);
+            window.setView(window.getDefaultView());
+            drawHealthBars(window, players, p1Wins, p2Wins);
+            if (currentState == ROUND_START) drawRoundNumber(window, currentRound);
+            else if (currentState == COUNTDOWN) drawCountdown(window, (int)countdownTimer);
+            else if (currentState == PAUSED) drawPauseScreen(window, pauseSelection);
+            else if (currentState == GAME_OVER) drawWinScreen(window, winnerIndex, p1Wins, p2Wins);
         }
-
         window.display();
     }
-
     return 0;
 }
