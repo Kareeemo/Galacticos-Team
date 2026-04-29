@@ -7,7 +7,7 @@ using namespace sf;
 namespace {
 constexpr float SPEED = 250.f;
 constexpr float JUMP_VELOCITY = -650.f;
-constexpr float ATTACK_BOX_WIDTH = 100.f;
+constexpr float ATTACK_BOX_WIDTH = 120.f;
 constexpr float ATTACK_BOX_HEIGHT = 80.f;
 }
 
@@ -75,6 +75,10 @@ void playerUpdate(Player& player, float dt) {
     } else if (player.inputRight && !player.inputLeft) {
         player.velocity.x = SPEED;
         player.facingRight = true;
+
+    } else if (player.inputLeft && player.inputRight && !player.onGround) {
+        player.velocity.x = (player.facingRight ? 1.f : -1.f) * SPEED * 2.0f;
+        
     } else {
         player.velocity.x *= 0.75f;
     }
