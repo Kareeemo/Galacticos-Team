@@ -1,6 +1,7 @@
 #include "Ui.h"
 #include "gameglobale.h"
 #include <string>
+#include <SFML/Audio.hpp>
 
 const sf::Color PLAYER_COLORS[2] = { sf::Color(80, 160, 255), sf::Color(255, 90, 90) };
 const float BAR_WIDTH  = 220.f;
@@ -9,10 +10,22 @@ const float BAR_Y      = 30.f;
 
 static sf::Font g_font;
 static bool     g_fontLoaded = false;
+static sf::Music g_backgroundMusic;
+static bool g_musicInitialized = false;
 
-static void loadFont() {
-    if (g_fontLoaded) return;
-    g_fontLoaded = g_font.openFromFile("assets/ArialNarrow7-9YJ9n.ttf") || g_font.openFromFile("assets/arial.ttf");
+static void loadAssets() {
+    if (!g_fontLoaded) {
+        g_fontLoaded = g_font.openFromFile("assets/ArialNarrow7-9YJ9n.ttf") || g_font.openFromFile("assets/arial.ttf");
+    }
+
+    if (!g_musicInitialized) {
+        if (g_backgroundMusic.openFromFile("assets/music.wav")) {
+            g_backgroundMusic.setLooping(true);
+            g_backgroundMusic.setVolume(40.f);
+            g_backgroundMusic.play();
+        }
+        g_musicInitialized = true;
+    }
 }
 
 static void drawWinDots(sf::RenderWindow& window, float xPos, int wins, int playerIndex) {
@@ -28,6 +41,7 @@ static void drawWinDots(sf::RenderWindow& window, float xPos, int wins, int play
 }
 
 void drawHealthBars(sf::RenderWindow& window, Player players[], int p1Wins, int p2Wins) {
+    loadAssets();
     for (int i = 0; i < MAX_PLAYERS; i++) {
         float xPos = (i == 0) ? 50.f : (1600.f - BAR_WIDTH - 50.f);
         int hp = players[i].isAlive ? players[i].health : 0;
@@ -46,7 +60,6 @@ void drawHealthBars(sf::RenderWindow& window, Player players[], int p1Wins, int 
             window.draw(fgBar);
         }
 
-        loadFont();
         if (g_fontLoaded) {
             sf::Text nameText(g_font, i == 0 ? "PLAYER 1" : "PLAYER 2", 15);
             nameText.setFillColor(PLAYER_COLORS[i]);
@@ -62,11 +75,11 @@ void drawRoundWinner(sf::RenderWindow& window, int winnerIndex) {
     sf::RectangleShape overlay({1600.f, 900.f});
     overlay.setFillColor(sf::Color(0, 0, 0, 120));
     window.draw(overlay);
-    loadFont();
+    loadAssets();
     if (!g_fontLoaded) return;
     std::string msg = (winnerIndex == 0) ? "PLAYER 1 WINS ROUND!" : "PLAYER 2 WINS ROUND!";
     sf::Text winText(g_font, msg, 70);
-    winText.setFillColor(sf::Color::White); // أبيض حسب طلبك
+    winText.setFillColor(sf::Color::White);
     winText.setStyle(sf::Text::Bold);
     winText.setOrigin({winText.getLocalBounds().size.x / 2.f, 0});
     winText.setPosition({800.f, 380.f});
@@ -77,7 +90,7 @@ void drawWinScreen(sf::RenderWindow& window, int winnerIndex, int p1Wins, int p2
     sf::RectangleShape overlay({1600.f, 900.f});
     overlay.setFillColor(sf::Color(0, 0, 0, 220));
     window.draw(overlay);
-    loadFont();
+    loadAssets();
     sf::Text header(g_font, "MATCH OVER", 50);
     header.setFillColor(sf::Color::Yellow);
     header.setOrigin({header.getLocalBounds().size.x / 2.f, 0});
@@ -99,8 +112,8 @@ void drawWinScreen(sf::RenderWindow& window, int winnerIndex, int p1Wins, int p2
     window.draw(subText);
 }
 
-// (دوال drawMainMenu, drawPauseScreen, drawCountdown, drawRoundNumber تبقى كما هي في الكود السابق)
 void drawMainMenu(sf::RenderWindow& window, int selectedItem) {
+    loadAssets();
     sf::RectangleShape bg({1600.f, 900.f});
     bg.setFillColor(sf::Color::Black);
     window.draw(bg);
@@ -114,7 +127,6 @@ void drawMainMenu(sf::RenderWindow& window, int selectedItem) {
         logo.setScale({700.f/size.x, 700.f/size.x});
         window.draw(logo);
     }
-    loadFont();
     sf::Text t1(g_font, "PLAY", 50); t1.setFillColor(selectedItem == 0 ? sf::Color::Yellow : sf::Color::White);
     t1.setOrigin({t1.getLocalBounds().size.x/2.f, 0}); t1.setPosition({800.f, 650.f}); window.draw(t1);
     sf::Text t2(g_font, "QUIT", 50); t2.setFillColor(selectedItem == 1 ? sf::Color::Yellow : sf::Color::White);
@@ -125,7 +137,7 @@ void drawPauseScreen(sf::RenderWindow& window, int pauseSelection) {
     sf::RectangleShape overlay({1600.f, 900.f});
     overlay.setFillColor(sf::Color(0, 0, 0, 150));
     window.draw(overlay);
-    loadFont();
+    loadAssets();
     sf::Text t(g_font, "PAUSED", 80); t.setOrigin({t.getLocalBounds().size.x/2.f, 0}); t.setPosition({800.f, 250.f}); window.draw(t);
     sf::Text r(g_font, "RESUME", 40); r.setFillColor(pauseSelection == 0 ? sf::Color::Yellow : sf::Color::White);
     r.setOrigin({r.getLocalBounds().size.x/2.f, 0}); r.setPosition({800.f, 450.f}); window.draw(r);
@@ -134,7 +146,7 @@ void drawPauseScreen(sf::RenderWindow& window, int pauseSelection) {
 }
 
 void drawCountdown(sf::RenderWindow& window, int count) {
-    loadFont();
+    loadAssets();
     std::string txt = (count == 3) ? "3" : (count == 2) ? "2" : (count == 1) ? "1" : "FIGHT!";
     sf::Text t(g_font, txt, (count == 0) ? 90 : 120);
     t.setFillColor((count == 0) ? sf::Color::Red : sf::Color::White);
@@ -144,7 +156,7 @@ void drawCountdown(sf::RenderWindow& window, int count) {
 }
 
 void drawRoundNumber(sf::RenderWindow& window, int round) {
-    loadFont();
+    loadAssets();
     sf::Text t(g_font, "ROUND " + std::to_string(round), 100);
     t.setOrigin({t.getLocalBounds().size.x/2.f, t.getLocalBounds().size.y/2.f});
     t.setPosition({800.f, 400.f});
