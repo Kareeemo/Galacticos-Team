@@ -66,6 +66,8 @@ void playerReadInputForIndex(Player& player, int index) {
 
 void playerUpdate(Player& player, float dt) {
     if (!player.isAlive) {
+        player.isAttacking = false;
+        player.attackBox = FloatRect({player.pos.x, player.pos.y}, {0.f, 0.f});
         return;
     }
 
