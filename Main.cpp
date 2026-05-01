@@ -75,7 +75,6 @@ int main() {
                 if (p1Wins == 2 || p2Wins == 2) {
                     currentState = GAME_OVER;
                 } else {
-                    // الانتقال الفوري للراوند التالي
                     currentRound++;
                     playerInit(players[0], 0, currentLevel); 
                     playerInit(players[1], 1, currentLevel);

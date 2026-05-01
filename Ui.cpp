@@ -42,6 +42,16 @@ static void drawWinDots(sf::RenderWindow& window, float xPos, int wins, int play
 
 void drawHealthBars(sf::RenderWindow& window, Player players[], int p1Wins, int p2Wins) {
     loadAssets();
+
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        float ratio = (float)players[i].health / players[i].maxHealth;
+        if (players[i].isAlive && ratio < 0.3f) {
+            sf::RectangleShape danger({ 1600.f, 900.f });
+            danger.setFillColor(sf::Color(139, 0, 0, 40));
+            window.draw(danger);
+        }
+    }
+
     for (int i = 0; i < MAX_PLAYERS; i++) {
         float xPos = (i == 0) ? 50.f : (1600.f - BAR_WIDTH - 50.f);
         int hp = players[i].isAlive ? players[i].health : 0;
@@ -131,6 +141,15 @@ void drawMainMenu(sf::RenderWindow& window, int selectedItem) {
     t1.setOrigin({t1.getLocalBounds().size.x/2.f, 0}); t1.setPosition({800.f, 650.f}); window.draw(t1);
     sf::Text t2(g_font, "QUIT", 50); t2.setFillColor(selectedItem == 1 ? sf::Color::Yellow : sf::Color::White);
     t2.setOrigin({t2.getLocalBounds().size.x/2.f, 0}); t2.setPosition({800.f, 750.f}); window.draw(t2);
+
+    static sf::Clock blinkClock;
+    if ((int)(blinkClock.getElapsedTime().asSeconds() * 2) % 2 == 0) {
+        sf::Text hint(g_font, "USE ARROW KEYS TO NAVIGATE", 20);
+        hint.setFillColor(sf::Color(150, 150, 150));
+        hint.setOrigin({ hint.getLocalBounds().size.x / 2.f, 0 });
+        hint.setPosition({ 800.f, 850.f });
+        window.draw(hint);
+    }
 }
 
 void drawPauseScreen(sf::RenderWindow& window, int pauseSelection) {
