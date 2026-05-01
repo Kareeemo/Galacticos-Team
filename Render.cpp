@@ -78,6 +78,7 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
     static bool attackVisualActive[MAX_PLAYERS] = {false};
     static int attackVisualFrame[MAX_PLAYERS] = {0};
     static float attackVisualTimer[MAX_PLAYERS] = {0.f};
+    static bool attackSoundLatched[MAX_PLAYERS] = {false};
     static int drawCallsThisFrame = 0;
 
     if (!triedLoadRunTexture) {
@@ -119,15 +120,22 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
         }
     }
 
-    if (p.isAttacking) {
-    attackVisualActive[playerIndex] = true;
-    attackVisualFrame[playerIndex] = 0;
-    attackVisualTimer[playerIndex] = 0.f;
-    static SoundBuffer hitBuffer;
-    static Sound hitSound(hitBuffer);
-    static bool hitLoaded = hitBuffer.loadFromFile("assets/hit 1.wav");
-    if (hitLoaded) hitSound.play();
-}
+    const bool attackStarted = p.isAttacking && !attackSoundLatched[playerIndex];
+    if (attackStarted) {
+        attackVisualActive[playerIndex] = true;
+        attackVisualFrame[playerIndex] = 0;
+        attackVisualTimer[playerIndex] = 0.f;
+        static SoundBuffer hitBuffer;
+        static Sound hitSound(hitBuffer);
+        static bool hitLoaded = hitBuffer.loadFromFile("assets/hit 1.wav");
+        if (hitLoaded) {
+            if (hitSound.getStatus() == SoundSource::Status::Playing) {
+                hitSound.stop();
+            }
+            hitSound.play();
+        }
+    }
+    attackSoundLatched[playerIndex] = p.isAttacking;
 
     if (attackVisualActive[playerIndex]) {
         const float attackFrameDuration = 0.05f;
