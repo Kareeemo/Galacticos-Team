@@ -44,15 +44,6 @@ void drawHealthBars(sf::RenderWindow& window, Player players[], int p1Wins, int 
     loadAssets();
 
     for (int i = 0; i < MAX_PLAYERS; i++) {
-        float ratio = (float)players[i].health / players[i].maxHealth;
-        if (players[i].isAlive && ratio < 0.3f) {
-            sf::RectangleShape danger({ 1600.f, 900.f });
-            danger.setFillColor(sf::Color(139, 0, 0, 40));
-            window.draw(danger);
-        }
-    }
-
-    for (int i = 0; i < MAX_PLAYERS; i++) {
         float xPos = (i == 0) ? 50.f : (1600.f - BAR_WIDTH - 50.f);
         int hp = players[i].isAlive ? players[i].health : 0;
         sf::RectangleShape bgBar({BAR_WIDTH, BAR_HEIGHT});
