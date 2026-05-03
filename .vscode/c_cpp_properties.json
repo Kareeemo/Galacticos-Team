@@ -1,17 +1,17 @@
 {
     "configurations": [
         {
-            "name": "Linux",
+            "name": "karim",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/home/ali/SFML/include"
+                "C:\\Users\\karim\\Documents\\libraries\\SFML-3.0.0\\include"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE"
             ],
-            "compilerPath": "/usr/bin/g++",
+            "compilerPath": "C:\\mingw64\\bin\\g++.exe",
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "linux-gcc-x64"
