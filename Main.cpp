@@ -89,7 +89,7 @@ int main() {
         window.clear(sf::Color::Black);
         if (currentState == MENU) drawMainMenu(window, menuSelection);
         else {
-            drawBackground(window); drawLevel(window, currentLevel);
+            drawBackground(window);drawLevel(window, currentLevel, 0);
             drawPlayer(window, players[0], 0, dt); drawPlayer(window, players[1], 1, dt);
             window.setView(window.getDefaultView());
             drawHealthBars(window, players, p1Wins, p2Wins);
