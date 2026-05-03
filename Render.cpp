@@ -1,6 +1,7 @@
 #include "Render.h"
 #include <cmath>
 #include "Level.h"
+#include <SFML/Audio.hpp>
 
 using namespace sf;
 
@@ -77,6 +78,7 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
     static bool attackVisualActive[MAX_PLAYERS] = {false};
     static int attackVisualFrame[MAX_PLAYERS] = {0};
     static float attackVisualTimer[MAX_PLAYERS] = {0.f};
+    static bool attackSoundLatched[MAX_PLAYERS] = {false};
     static int drawCallsThisFrame = 0;
 
     if (!triedLoadRunTexture) {
@@ -118,11 +120,22 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
         }
     }
 
-    if (p.isAttacking) {
+    const bool attackStarted = p.isAttacking && !attackSoundLatched[playerIndex];
+    if (attackStarted) {
         attackVisualActive[playerIndex] = true;
         attackVisualFrame[playerIndex] = 0;
         attackVisualTimer[playerIndex] = 0.f;
+        static SoundBuffer hitBuffer;
+        static Sound hitSound(hitBuffer);
+        static bool hitLoaded = hitBuffer.loadFromFile("assets/hit 1.wav");
+        if (hitLoaded) {
+            if (hitSound.getStatus() == SoundSource::Status::Playing) {
+                hitSound.stop();
+            }
+            hitSound.play();
+        }
     }
+    attackSoundLatched[playerIndex] = p.isAttacking;
 
     if (attackVisualActive[playerIndex]) {
         const float attackFrameDuration = 0.05f;
@@ -177,7 +190,7 @@ void drawPlayer(RenderWindow& window, Player& p, int playerIndex, float dt) {
 
 void drawBackground(RenderWindow& window) {
     static Texture backgroundTexture;
-    static bool textureLoaded = backgroundTexture.loadFromFile("assets/hero.png");
+  static bool textureLoaded = backgroundTexture.loadFromFile("assets/hero.png");
 
     if (textureLoaded) {
         Sprite background(backgroundTexture);
@@ -196,9 +209,30 @@ void drawBackground(RenderWindow& window) {
     bg.setFillColor(Color(30, 30, 30));
     window.draw(bg);
 }
+void drawLevel(RenderWindow& window, Level& level) {
+    for (int i = 0; i < level.platformCount; i++) {
+        RectangleShape platform(Vector2f(
+            level.platforms[i].size.x,
+            level.platforms[i].size.y
+        ));
+        platform.setPosition(Vector2f(
+            level.platforms[i].position.x,
+            level.platforms[i].position.y
+        ));
+        platform.setFillColor(level.platforms[i].color);
+        window.draw(platform);
+    }
+}
 
+void drawLevel(sf::RenderWindow& window, const Level& level, int levelId) {
+    static sf::Texture platformTexture1;
+    static sf::Texture platformTexture2;
+    static bool texLoaded1 = platformTexture1.loadFromFile("assets/platform.png");
+    static bool texLoaded2 = platformTexture2.loadFromFile("assets/LavaW_StonePlatform1.png");
 
-void drawLevel(sf::RenderWindow& window, const Level& level) {
+    bool isLevel2 = (levelId == 1);
+    sf::Texture& currentTexture = isLevel2 ? platformTexture2 : platformTexture1;
+    bool texLoaded = isLevel2 ? texLoaded2 : texLoaded1;
     for (int i = 0; i < level.platformCount; i++) {
         sf::RectangleShape rect(sf::Vector2f(
             level.platforms[i].size.x,
@@ -208,7 +242,14 @@ void drawLevel(sf::RenderWindow& window, const Level& level) {
             level.platforms[i].position.x,
             level.platforms[i].position.y
         ));
-        rect.setFillColor(level.platforms[i].color);
-        window.draw(rect);
+       if (texLoaded) {
+    sf::Sprite platformSprite(currentTexture);
+    platformSprite.setPosition(sf::Vector2f(level.platforms[i].position.x, level.platforms[i].position.y));
+    platformSprite.setScale(sf::Vector2f(level.platforms[i].size.x / currentTexture.getSize().x, level.platforms[i].size.y / currentTexture.getSize().y));
+    window.draw(platformSprite);
+} else {
+    rect.setFillColor(level.platforms[i].color);
+    window.draw(rect);
+}
     }
 }

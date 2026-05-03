@@ -6,9 +6,9 @@ using namespace sf;
 
 namespace {
 constexpr float SPEED = 250.f;
-constexpr float JUMP_VELOCITY = -550.f;
-constexpr float ATTACK_BOX_WIDTH = 40.f;
-constexpr float ATTACK_BOX_HEIGHT = 20.f;
+constexpr float JUMP_VELOCITY = -650.f;
+constexpr float ATTACK_BOX_WIDTH = 120.f;
+constexpr float ATTACK_BOX_HEIGHT = 80.f;
 }
 
 void playerInit(Player& player, int index, const Level& level) {
@@ -66,6 +66,8 @@ void playerReadInputForIndex(Player& player, int index) {
 
 void playerUpdate(Player& player, float dt) {
     if (!player.isAlive) {
+        player.isAttacking = false;
+        player.attackBox = FloatRect({player.pos.x, player.pos.y}, {0.f, 0.f});
         return;
     }
 
@@ -75,6 +77,10 @@ void playerUpdate(Player& player, float dt) {
     } else if (player.inputRight && !player.inputLeft) {
         player.velocity.x = SPEED;
         player.facingRight = true;
+
+    } else if (player.inputLeft && player.inputRight && !player.onGround) {
+        player.velocity.x = (player.facingRight ? 1.f : -1.f) * SPEED * 2.0f;
+        
     } else {
         player.velocity.x *= 0.75f;
     }
